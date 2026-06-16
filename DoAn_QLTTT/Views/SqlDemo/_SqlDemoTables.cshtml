@@ -1,0 +1,64 @@
+@model IReadOnlyList<SqlDemoTableViewModel>
+
+@functions {
+    private static string FormatCell(object? value)
+    {
+        return value switch
+        {
+            null => "",
+            decimal number => number.ToString("N0"),
+            double number => number.ToString("N0"),
+            float number => number.ToString("N0"),
+            int number => number.ToString("N0"),
+            long number => number.ToString("N0"),
+            DateTime date => date.ToString("dd/MM/yyyy"),
+            _ => value.ToString() ?? ""
+        };
+    }
+}
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border mb-0">Chưa có dữ liệu để hiển thị.</div>
+}
+else
+{
+    foreach (var table in Model)
+    {
+        <div class="mb-3">
+            <div class="fw-800 mb-2">@table.Title</div>
+            <div class="table-responsive border rounded-2">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            @foreach (var column in table.Columns)
+                            {
+                                <th>@column</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (table.Rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="@Math.Max(table.Columns.Count, 1)" class="text-muted">Không có dòng dữ liệu.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var row in table.Rows)
+                            {
+                                <tr>
+                                    @foreach (var column in table.Columns)
+                                    {
+                                        <td>@FormatCell(row.TryGetValue(column, out var value) ? value : null)</td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}

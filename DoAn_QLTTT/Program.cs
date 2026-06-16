@@ -24,10 +24,13 @@ builder.Services.AddScoped<DapperContext>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<INhacNoService, NhacNoService>();
+builder.Services.AddScoped<ISqlScriptReader, SqlScriptReader>();
 
 var dataProvider = builder.Configuration["DataProvider"] ?? "Mock";
-if (dataProvider.Equals("Dapper", StringComparison.OrdinalIgnoreCase))
+if (dataProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase)
+    || dataProvider.Equals("Dapper", StringComparison.OrdinalIgnoreCase))
 {
+    builder.Services.AddScoped<ISqlDemoService, SqlDemoService>();
     builder.Services.AddScoped<ILoaiPhongRepository, LoaiPhongDapperRepository>();
     builder.Services.AddScoped<IPhongTroRepository, PhongTroDapperRepository>();
     builder.Services.AddScoped<IKhachThueRepository, KhachThueDapperRepository>();
@@ -40,6 +43,7 @@ if (dataProvider.Equals("Dapper", StringComparison.OrdinalIgnoreCase))
 }
 else
 {
+    builder.Services.AddScoped<ISqlDemoService, MockSqlDemoService>();
     builder.Services.AddScoped<ILoaiPhongRepository, LoaiPhongMockRepository>();
     builder.Services.AddScoped<IPhongTroRepository, PhongTroMockRepository>();
     builder.Services.AddScoped<IKhachThueRepository, KhachThueMockRepository>();
