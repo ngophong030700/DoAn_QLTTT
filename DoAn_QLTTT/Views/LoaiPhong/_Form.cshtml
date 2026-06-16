@@ -1,0 +1,32 @@
+@model LoaiPhongFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaLoaiPhong" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="TenLoai" class="form-label"></label>
+        <input asp-for="TenLoai" class="form-control" />
+        <span asp-validation-for="TenLoai" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="DienTich" class="form-label"></label>
+        <input asp-for="DienTich" class="form-control" />
+        <span asp-validation-for="DienTich" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="GiaThueCoSo" class="form-label"></label>
+        <input asp-for="GiaThueCoSo" class="form-control" />
+        <span asp-validation-for="GiaThueCoSo" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="SucChuaToiDa" class="form-label"></label>
+        <input asp-for="SucChuaToiDa" class="form-control" />
+        <span asp-validation-for="SucChuaToiDa" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

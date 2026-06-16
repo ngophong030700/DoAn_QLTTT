@@ -1,0 +1,44 @@
+@model PhongTroFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaPhong" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="SoPhong" class="form-label"></label>
+        <input asp-for="SoPhong" class="form-control" />
+        <span asp-validation-for="SoPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaLoaiPhong" class="form-label"></label>
+        <select asp-for="MaLoaiPhong" asp-items="Model.LoaiPhongOptions" class="form-select">
+            <option value="">-- Chọn loại phòng --</option>
+        </select>
+        <span asp-validation-for="MaLoaiPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="GiaThue" class="form-label"></label>
+        <input asp-for="GiaThue" class="form-control" />
+        <span asp-validation-for="GiaThue" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SucChuaToiDa" class="form-label"></label>
+        <input asp-for="SucChuaToiDa" class="form-control" />
+        <span asp-validation-for="SucChuaToiDa" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TrangThai" class="form-label"></label>
+        <select asp-for="TrangThai" asp-items="Model.TrangThaiOptions" class="form-select"></select>
+        <span asp-validation-for="TrangThai" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="GhiChu" class="form-label"></label>
+        <textarea asp-for="GhiChu" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="GhiChu" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

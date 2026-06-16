@@ -1,0 +1,27 @@
+@model ChiSoDienNuoc
+@{
+    ViewData["Title"] = "Chi tiết chỉ số điện/nước";
+}
+
+<div class="detail-panel">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Phòng</dt>
+        <dd class="col-sm-9">@Model.SoPhong</dd>
+        <dt class="col-sm-3">Dịch vụ</dt>
+        <dd class="col-sm-9">@Model.DichVuTen</dd>
+        <dt class="col-sm-3">Tháng/Năm</dt>
+        <dd class="col-sm-9">@Model.Thang/@Model.Nam</dd>
+        <dt class="col-sm-3">Chỉ số cũ</dt>
+        <dd class="col-sm-9">@FormatHelper.Number(Model.ChiSoCu)</dd>
+        <dt class="col-sm-3">Chỉ số mới</dt>
+        <dd class="col-sm-9">@FormatHelper.Number(Model.ChiSoMoi)</dd>
+        <dt class="col-sm-3">Tiêu thụ</dt>
+        <dd class="col-sm-9">@FormatHelper.Number(Model.TieuThu)</dd>
+        <dt class="col-sm-3">Người nhập</dt>
+        <dd class="col-sm-9">@Model.NguoiNhapHoTen</dd>
+    </dl>
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaChiSo">Sửa</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>

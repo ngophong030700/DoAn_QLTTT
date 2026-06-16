@@ -1,0 +1,13 @@
+@model ChiSoDienNuoc
+@{
+    ViewData["Title"] = "Xóa chỉ số điện/nước";
+}
+
+<div class="detail-panel">
+    <h2 class="h5">Xác nhận xóa chỉ số @Model.DichVuTen phòng @Model.SoPhong tháng @Model.Thang/@Model.Nam?</h2>
+    <form asp-action="Delete" method="post" class="mt-3 d-flex gap-2">
+        <input type="hidden" name="id" value="@Model.MaChiSo" />
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+    </form>
+</div>

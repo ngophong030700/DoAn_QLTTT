@@ -1,0 +1,38 @@
+@model NguoiDungFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaNguoiDung" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="TenDangNhap" class="form-label"></label>
+        <input asp-for="TenDangNhap" class="form-control" />
+        <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MatKhau" class="form-label"></label>
+        <input asp-for="MatKhau" class="form-control" />
+        <span asp-validation-for="MatKhau" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="HoTen" class="form-label"></label>
+        <input asp-for="HoTen" class="form-control" />
+        <span asp-validation-for="HoTen" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="VaiTro" class="form-label"></label>
+        <select asp-for="VaiTro" asp-items="Model.VaiTroOptions" class="form-select"></select>
+        <span asp-validation-for="VaiTro" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="DangHoatDong" class="form-check-input" />
+            <label asp-for="DangHoatDong" class="form-check-label"></label>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

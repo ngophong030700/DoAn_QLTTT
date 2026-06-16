@@ -1,0 +1,102 @@
+@model HoaDonDetailsViewModel
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn";
+}
+
+<div class="detail-panel mb-3">
+    <div class="d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <h2 class="h5 mb-2">Hóa đơn #@Model.HoaDon.MaHoaDon</h2>
+            <div class="text-muted">@Model.HoaDon.HopDongMoTa - @Model.HoaDon.KhachDaiDienHoTen</div>
+        </div>
+        <span class="badge @BadgeHelper.HoaDonStatusClass(Model.HoaDon.TrangThai)">@Model.HoaDon.TrangThai</span>
+    </div>
+    <hr />
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="stat-label">Tháng/Năm</div>
+            <div class="fw-semibold">@Model.HoaDon.Thang/@Model.HoaDon.Nam</div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-label">Tổng tiền</div>
+            <div class="fw-semibold">@FormatHelper.Money(Model.HoaDon.TongTien)</div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-label">Đã thanh toán</div>
+            <div class="fw-semibold">@FormatHelper.Money(Model.HoaDon.DaThanhToan)</div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-label">Còn lại</div>
+            <div class="fw-semibold">@FormatHelper.Money(Model.HoaDon.ConLai)</div>
+        </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-primary" asp-controller="ThanhToan" asp-action="Create" asp-route-maHoaDon="@Model.HoaDon.MaHoaDon">Ghi nhận thanh toán</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-7">
+        <div class="table-card">
+            <div class="p-3 border-bottom">
+                <h3 class="h6 mb-0">Chi tiết hóa đơn</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Dịch vụ</th>
+                            <th>Mô tả</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ChiTietHoaDons)
+                        {
+                            <tr>
+                                <td>@item.TenDichVu</td>
+                                <td>@item.MoTa</td>
+                                <td>@FormatHelper.Number(item.SoLuong)</td>
+                                <td>@FormatHelper.Money(item.DonGiaTaiThoiDiem)</td>
+                                <td>@FormatHelper.Money(item.ThanhTien)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="table-card">
+            <div class="p-3 border-bottom">
+                <h3 class="h6 mb-0">Lịch sử thanh toán</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Ngày thu</th>
+                            <th>Số tiền</th>
+                            <th>Hình thức</th>
+                            <th>Người thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ThanhToans)
+                        {
+                            <tr>
+                                <td>@item.NgayThu.ToString("dd/MM/yyyy")</td>
+                                <td>@FormatHelper.Money(item.SoTien)</td>
+                                <td>@item.HinhThuc</td>
+                                <td>@item.NguoiThuHoTen</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

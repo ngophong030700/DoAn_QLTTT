@@ -1,0 +1,25 @@
+@model PhongTro
+@{
+    ViewData["Title"] = "Chi tiết phòng trọ";
+}
+
+<div class="detail-panel">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Số phòng</dt>
+        <dd class="col-sm-9">@Model.SoPhong</dd>
+        <dt class="col-sm-3">Loại phòng</dt>
+        <dd class="col-sm-9">@Model.LoaiPhongTen</dd>
+        <dt class="col-sm-3">Giá thuê</dt>
+        <dd class="col-sm-9">@FormatHelper.Money(Model.GiaThue)</dd>
+        <dt class="col-sm-3">Sức chứa</dt>
+        <dd class="col-sm-9">@Model.SucChuaToiDa</dd>
+        <dt class="col-sm-3">Trạng thái</dt>
+        <dd class="col-sm-9"><span class="badge @BadgeHelper.PhongStatusClass(Model.TrangThai)">@Model.TrangThai</span></dd>
+        <dt class="col-sm-3">Ghi chú</dt>
+        <dd class="col-sm-9">@Model.GhiChu</dd>
+    </dl>
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaPhong">Sửa</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>

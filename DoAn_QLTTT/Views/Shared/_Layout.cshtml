@@ -1,0 +1,79 @@
+@{
+    var controller = (string?)ViewContext.RouteData.Values["controller"] ?? "";
+    string Active(string name) => string.Equals(controller, name, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý thuê phòng trọ</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoAn_QLTTT.styles.css" asp-append-version="true" />
+</head>
+<body class="admin-shell">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-mark">PT</div>
+            <div>
+                <div class="brand-title">QL Phòng Trọ</div>
+                <div class="brand-subtitle">Demo đồ án</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+            <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">Loại phòng</a>
+            <a class="@Active("PhongTro")" asp-controller="PhongTro" asp-action="Index">Phòng trọ</a>
+            <a class="@Active("KhachThue")" asp-controller="KhachThue" asp-action="Index">Khách thuê</a>
+            <a class="@Active("HopDong")" asp-controller="HopDong" asp-action="Index">Hợp đồng</a>
+            <a class="@Active("DichVu")" asp-controller="DichVu" asp-action="Index">Dịch vụ</a>
+            <a class="@Active("ChiSoDienNuoc")" asp-controller="ChiSoDienNuoc" asp-action="Index">Chỉ số điện/nước</a>
+            <a class="@Active("HoaDon")" asp-controller="HoaDon" asp-action="Index">Hóa đơn</a>
+            <a class="@Active("ThanhToan")" asp-controller="ThanhToan" asp-action="Index">Thanh toán</a>
+            <a class="@Active("NhacNo")" asp-controller="NhacNo" asp-action="Index">Nhắc nợ</a>
+            <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">Người dùng</a>
+        </nav>
+    </aside>
+
+    <div class="main-panel">
+        <nav class="navbar navbar-expand bg-white border-bottom admin-topbar">
+            <div class="container-fluid">
+                <div>
+                    <div class="topbar-title">@ViewData["Title"]</div>
+                    <div class="topbar-subtitle">Hệ thống Web quản lý thuê phòng trọ</div>
+                </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <span class="badge text-bg-dark">@ViewBag.CurrentUserRole</span>
+                    <span class="text-muted small">@ViewBag.CurrentUserName</span>
+                </div>
+            </div>
+        </nav>
+
+        <main role="main" class="content-wrap">
+            @if (TempData["SuccessMessage"] is not null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] is not null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

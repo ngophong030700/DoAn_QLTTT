@@ -1,0 +1,50 @@
+@model NhacNoViewModel
+@{
+    ViewData["Title"] = "Nhắc nợ";
+}
+
+<div class="page-actions">
+    <div>
+        @if (Model.SoHoaDonDaQuet.HasValue)
+        {
+            <span class="badge text-bg-info">Đã quét @Model.SoHoaDonDaQuet.Value hóa đơn quá hạn</span>
+        }
+    </div>
+    <form asp-action="QuetQuaHan" method="post">
+        <button class="btn btn-primary" type="submit">Quét hóa đơn quá hạn</button>
+    </form>
+</div>
+
+<div class="table-card table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Hợp đồng</th>
+                <th>Khách</th>
+                <th>Tháng/Năm</th>
+                <th>Hạn thanh toán</th>
+                <th>Còn lại</th>
+                <th>Trạng thái</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.HoaDonQuaHans)
+            {
+                <tr>
+                    <td>#@item.MaHoaDon</td>
+                    <td>@item.HopDongMoTa</td>
+                    <td>@item.KhachDaiDienHoTen</td>
+                    <td>@item.Thang/@item.Nam</td>
+                    <td>@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
+                    <td class="fw-semibold">@FormatHelper.Money(item.ConLai)</td>
+                    <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-controller="HoaDon" asp-action="Details" asp-route-id="@item.MaHoaDon">Xem hóa đơn</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

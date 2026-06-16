@@ -1,0 +1,115 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Tổng số phòng</div>
+            <div class="stat-value">@Model.TongSoPhong</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Phòng trống</div>
+            <div class="stat-value">@Model.PhongTrong</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Phòng đang thuê</div>
+            <div class="stat-value">@Model.PhongDangThue</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Hóa đơn chưa thanh toán</div>
+            <div class="stat-value">@Model.HoaDonChuaThanhToan</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Hóa đơn quá hạn</div>
+            <div class="stat-value">@Model.HoaDonQuaHan</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Doanh thu tháng</div>
+            <div class="stat-value">@FormatHelper.Money(Model.DoanhThuThang)</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-label">Tổng công nợ</div>
+            <div class="stat-value">@FormatHelper.Money(Model.TongCongNo)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-8">
+        <div class="table-card">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0">Hóa đơn gần đây</h2>
+                <a class="btn btn-sm btn-outline-primary" asp-controller="HoaDon" asp-action="Index">Xem tất cả</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Hợp đồng</th>
+                            <th>Tháng/Năm</th>
+                            <th>Tổng tiền</th>
+                            <th>Còn lại</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.HoaDonGanDay)
+                        {
+                            <tr>
+                                <td>#@item.MaHoaDon</td>
+                                <td>@item.HopDongMoTa</td>
+                                <td>@item.Thang/@item.Nam</td>
+                                <td>@FormatHelper.Money(item.TongTien)</td>
+                                <td>@FormatHelper.Money(item.ConLai)</td>
+                                <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="table-card">
+            <div class="p-3 border-bottom">
+                <h2 class="h6 mb-0">Phòng đang thuê</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Phòng</th>
+                            <th>Loại</th>
+                            <th>Giá thuê</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PhongDangThueList)
+                        {
+                            <tr>
+                                <td>@item.SoPhong</td>
+                                <td>@item.LoaiPhongTen</td>
+                                <td>@FormatHelper.Money(item.GiaThue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+@model NguoiDungFormViewModel
+@{
+    ViewData["Title"] = "Thêm người dùng";
+}
+
+<form asp-action="Create" method="post" class="form-panel">
+    @await Html.PartialAsync("_Form", Model)
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

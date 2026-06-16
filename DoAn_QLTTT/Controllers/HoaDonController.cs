@@ -1,0 +1,171 @@
+using DoAn_QLTTT.Models;
+using DoAn_QLTTT.Repositories;
+using DoAn_QLTTT.Services;
+using DoAn_QLTTT.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace DoAn_QLTTT.Controllers;
+
+public class HoaDonController : AdminControllerBase
+{
+    private readonly IHoaDonRepository _repository;
+    private readonly IHopDongRepository _hopDongRepository;
+    private readonly INguoiDungRepository _nguoiDungRepository;
+    private readonly IThanhToanRepository _thanhToanRepository;
+    private readonly IHoaDonService _hoaDonService;
+
+    public HoaDonController(
+        IHoaDonRepository repository,
+        IHopDongRepository hopDongRepository,
+        INguoiDungRepository nguoiDungRepository,
+        IThanhToanRepository thanhToanRepository,
+        IHoaDonService hoaDonService)
+    {
+        _repository = repository;
+        _hopDongRepository = hopDongRepository;
+        _nguoiDungRepository = nguoiDungRepository;
+        _thanhToanRepository = thanhToanRepository;
+        _hoaDonService = hoaDonService;
+    }
+
+    public async Task<IActionResult> Index(string? keyword)
+    {
+        ViewBag.Keyword = keyword;
+        return View(await _repository.GetAllAsync(keyword));
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var entity = await _repository.GetByIdAsync(id);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        return View(new HoaDonDetailsViewModel
+        {
+            HoaDon = entity,
+            ChiTietHoaDons = await _repository.GetChiTietAsync(id),
+            ThanhToans = await _thanhToanRepository.GetByHoaDonAsync(id)
+        });
+    }
+
+    public async Task<IActionResult> Create()
+    {
+        return View(await BuildFormAsync(new HoaDonFormViewModel
+        {
+            MaNguoiLap = 2,
+            TrangThai = AppStatuses.HoaDon.ChuaThanhToan
+        }));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(HoaDonFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(await BuildFormAsync(model));
+        }
+
+        await _repository.AddAsync(ToEntity(model));
+        // TODO: DB thật sẽ tính tổng từ ChiTietHoaDon qua trigger sau khi thêm dòng chi tiết.
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var entity = await _repository.GetByIdAsync(id);
+        return entity is null ? NotFound() : View(await BuildFormAsync(ToForm(entity)));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, HoaDonFormViewModel model)
+    {
+        if (id != model.MaHoaDon)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(await BuildFormAsync(model));
+        }
+
+        var current = await _repository.GetByIdAsync(id);
+        if (current is null)
+        {
+            return NotFound();
+        }
+
+        var updated = ToEntity(model);
+        updated.TongTien = current.TongTien;
+        updated.DaThanhToan = current.DaThanhToan;
+        updated.ConLai = current.ConLai;
+        await _repository.UpdateAsync(updated);
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entity = await _repository.GetByIdAsync(id);
+        return entity is null ? NotFound() : View(entity);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await _repository.DeleteAsync(id);
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> LapHoaDonDemo()
+    {
+        var maHoaDon = await _hoaDonService.LapHoaDonDemoAsync();
+        if (maHoaDon == 0)
+        {
+            TempData["ErrorMessage"] = "Chưa có hợp đồng hiệu lực để lập hóa đơn demo.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["SuccessMessage"] = "Đã lập hóa đơn demo từ hợp đồng đầu tiên đang hiệu lực.";
+        return RedirectToAction(nameof(Details), new { id = maHoaDon });
+    }
+
+    private async Task<HoaDonFormViewModel> BuildFormAsync(HoaDonFormViewModel model)
+    {
+        model.HopDongOptions = (await _hopDongRepository.GetAllAsync())
+            .Select(x => new SelectListItem($"HĐ #{x.MaHopDong} - Phòng {x.SoPhong} - {x.KhachDaiDienHoTen}", x.MaHopDong.ToString(), x.MaHopDong == model.MaHopDong));
+        model.NguoiDungOptions = (await _nguoiDungRepository.GetAllAsync())
+            .Select(x => new SelectListItem(x.HoTen, x.MaNguoiDung.ToString(), x.MaNguoiDung == model.MaNguoiLap));
+        model.TrangThaiOptions = AppStatuses.HoaDon.All.Select(x => new SelectListItem(x, x, x == model.TrangThai));
+        return model;
+    }
+
+    private static HoaDon ToEntity(HoaDonFormViewModel model) => new()
+    {
+        MaHoaDon = model.MaHoaDon,
+        MaHopDong = model.MaHopDong,
+        MaNguoiLap = model.MaNguoiLap,
+        Thang = model.Thang,
+        Nam = model.Nam,
+        HanThanhToan = model.HanThanhToan,
+        TrangThai = model.TrangThai
+    };
+
+    private static HoaDonFormViewModel ToForm(HoaDon entity) => new()
+    {
+        MaHoaDon = entity.MaHoaDon,
+        MaHopDong = entity.MaHopDong,
+        MaNguoiLap = entity.MaNguoiLap,
+        Thang = entity.Thang,
+        Nam = entity.Nam,
+        HanThanhToan = entity.HanThanhToan,
+        TrangThai = entity.TrangThai
+    };
+}

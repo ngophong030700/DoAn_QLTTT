@@ -1,0 +1,42 @@
+@model IEnumerable<KhachThue>
+@{
+    ViewData["Title"] = "Quản lý khách thuê";
+}
+
+<div class="page-actions">
+    <form class="d-flex search-box" method="get">
+        <input class="form-control me-2" type="search" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm họ tên, CCCD, điện thoại" />
+        <button class="btn btn-outline-secondary" type="submit">Tìm</button>
+    </form>
+    <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
+</div>
+
+<div class="table-card table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Họ tên</th>
+                <th>CCCD</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">@item.HoTen</td>
+                    <td>@item.CCCD</td>
+                    <td>@item.SoDienThoai</td>
+                    <td>@item.DiaChi</td>
+                    <td class="action-cell text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.MaKhach">Xem</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.MaKhach">Sửa</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.MaKhach">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

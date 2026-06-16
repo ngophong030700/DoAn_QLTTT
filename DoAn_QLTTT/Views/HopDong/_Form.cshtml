@@ -1,0 +1,51 @@
+@model HopDongFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaHopDong" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="MaPhong" class="form-label"></label>
+        <select asp-for="MaPhong" asp-items="Model.PhongOptions" class="form-select">
+            <option value="">-- Chọn phòng --</option>
+        </select>
+        <span asp-validation-for="MaPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaKhachDaiDien" class="form-label"></label>
+        <select asp-for="MaKhachDaiDien" asp-items="Model.KhachOptions" class="form-select">
+            <option value="">-- Chọn khách --</option>
+        </select>
+        <span asp-validation-for="MaKhachDaiDien" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="NgayBatDau" class="form-label"></label>
+        <input asp-for="NgayBatDau" class="form-control" />
+        <span asp-validation-for="NgayBatDau" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="NgayKetThuc" class="form-label"></label>
+        <input asp-for="NgayKetThuc" class="form-control" />
+        <span asp-validation-for="NgayKetThuc" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TienThueThang" class="form-label"></label>
+        <input asp-for="TienThueThang" class="form-control" />
+        <span asp-validation-for="TienThueThang" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TienCoc" class="form-label"></label>
+        <input asp-for="TienCoc" class="form-control" />
+        <span asp-validation-for="TienCoc" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TrangThai" class="form-label"></label>
+        <select asp-for="TrangThai" asp-items="Model.TrangThaiOptions" class="form-select"></select>
+        <span asp-validation-for="TrangThai" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

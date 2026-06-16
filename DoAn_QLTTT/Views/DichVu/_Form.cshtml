@@ -1,0 +1,32 @@
+@model DichVuFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaDichVu" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="TenDichVu" class="form-label"></label>
+        <input asp-for="TenDichVu" class="form-control" />
+        <span asp-validation-for="TenDichVu" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="DonVi" class="form-label"></label>
+        <input asp-for="DonVi" class="form-control" />
+        <span asp-validation-for="DonVi" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="DonGia" class="form-label"></label>
+        <input asp-for="DonGia" class="form-control" />
+        <span asp-validation-for="DonGia" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="LoaiTinhPhi" class="form-label"></label>
+        <input asp-for="LoaiTinhPhi" class="form-control" placeholder="Theo chỉ số hoặc Cố định" />
+        <span asp-validation-for="LoaiTinhPhi" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

@@ -1,0 +1,27 @@
+@model HopDong
+@{
+    ViewData["Title"] = "Chi tiết hợp đồng";
+}
+
+<div class="detail-panel">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Mã hợp đồng</dt>
+        <dd class="col-sm-9">#@Model.MaHopDong</dd>
+        <dt class="col-sm-3">Phòng</dt>
+        <dd class="col-sm-9">@Model.SoPhong</dd>
+        <dt class="col-sm-3">Khách đại diện</dt>
+        <dd class="col-sm-9">@Model.KhachDaiDienHoTen</dd>
+        <dt class="col-sm-3">Thời hạn</dt>
+        <dd class="col-sm-9">@Model.NgayBatDau.ToString("dd/MM/yyyy") - @(Model.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "Không xác định")</dd>
+        <dt class="col-sm-3">Tiền thuê tháng</dt>
+        <dd class="col-sm-9">@FormatHelper.Money(Model.TienThueThang)</dd>
+        <dt class="col-sm-3">Tiền cọc</dt>
+        <dd class="col-sm-9">@FormatHelper.Money(Model.TienCoc)</dd>
+        <dt class="col-sm-3">Trạng thái</dt>
+        <dd class="col-sm-9"><span class="badge @BadgeHelper.HopDongStatusClass(Model.TrangThai)">@Model.TrangThai</span></dd>
+    </dl>
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaHopDong">Sửa</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>

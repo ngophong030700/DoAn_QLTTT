@@ -1,0 +1,13 @@
+@model HoaDon
+@{
+    ViewData["Title"] = "Xóa hóa đơn";
+}
+
+<div class="detail-panel">
+    <h2 class="h5">Xác nhận xóa hóa đơn #@Model.MaHoaDon?</h2>
+    <form asp-action="Delete" method="post" class="mt-3 d-flex gap-2">
+        <input type="hidden" name="id" value="@Model.MaHoaDon" />
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+    </form>
+</div>

@@ -1,0 +1,20 @@
+using DoAn_QLTTT.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace DoAn_QLTTT.Controllers;
+
+public class DashboardController : AdminControllerBase
+{
+    private readonly IDashboardService _dashboardService;
+
+    public DashboardController(IDashboardService dashboardService)
+    {
+        _dashboardService = dashboardService;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        ViewData["Title"] = "Dashboard";
+        return View(await _dashboardService.GetDashboardAsync());
+    }
+}

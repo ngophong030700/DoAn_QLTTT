@@ -1,0 +1,51 @@
+@model ChiSoDienNuocFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaChiSo" />
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <label asp-for="MaPhong" class="form-label"></label>
+        <select asp-for="MaPhong" asp-items="Model.PhongOptions" class="form-select">
+            <option value="">-- Chọn phòng --</option>
+        </select>
+        <span asp-validation-for="MaPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="MaDichVu" class="form-label"></label>
+        <select asp-for="MaDichVu" asp-items="Model.DichVuOptions" class="form-select">
+            <option value="">-- Chọn dịch vụ --</option>
+        </select>
+        <span asp-validation-for="MaDichVu" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="MaNguoiNhap" class="form-label"></label>
+        <select asp-for="MaNguoiNhap" asp-items="Model.NguoiDungOptions" class="form-select"></select>
+        <span asp-validation-for="MaNguoiNhap" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Thang" class="form-label"></label>
+        <input asp-for="Thang" class="form-control" />
+        <span asp-validation-for="Thang" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Nam" class="form-label"></label>
+        <input asp-for="Nam" class="form-control" />
+        <span asp-validation-for="Nam" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ChiSoCu" class="form-label"></label>
+        <input asp-for="ChiSoCu" class="form-control" />
+        <span asp-validation-for="ChiSoCu" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ChiSoMoi" class="form-label"></label>
+        <input asp-for="ChiSoMoi" class="form-control" />
+        <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

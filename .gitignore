@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+
+DoAn_QLTTT/bin/
+DoAn_QLTTT/obj/
+DoAn_QLTTT/App_Data/DataProtectionKeys/

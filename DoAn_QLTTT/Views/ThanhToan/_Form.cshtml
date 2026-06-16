@@ -1,0 +1,39 @@
+@model ThanhToanFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<input type="hidden" asp-for="MaThanhToan" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="MaHoaDon" class="form-label"></label>
+        <select asp-for="MaHoaDon" asp-items="Model.HoaDonOptions" class="form-select">
+            <option value="">-- Chọn hóa đơn --</option>
+        </select>
+        <span asp-validation-for="MaHoaDon" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaNguoiThu" class="form-label"></label>
+        <select asp-for="MaNguoiThu" asp-items="Model.NguoiDungOptions" class="form-select"></select>
+        <span asp-validation-for="MaNguoiThu" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SoTien" class="form-label"></label>
+        <input asp-for="SoTien" class="form-control" />
+        <span asp-validation-for="SoTien" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="NgayThu" class="form-label"></label>
+        <input asp-for="NgayThu" class="form-control" />
+        <span asp-validation-for="NgayThu" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="HinhThuc" class="form-label"></label>
+        <input asp-for="HinhThuc" class="form-control" placeholder="Tiền mặt, chuyển khoản" />
+        <span asp-validation-for="HinhThuc" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+</div>

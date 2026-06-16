@@ -1,0 +1,23 @@
+@model LoaiPhong
+@{
+    ViewData["Title"] = "Chi tiết loại phòng";
+}
+
+<div class="detail-panel">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Mã loại</dt>
+        <dd class="col-sm-9">@Model.MaLoaiPhong</dd>
+        <dt class="col-sm-3">Tên loại</dt>
+        <dd class="col-sm-9">@Model.TenLoai</dd>
+        <dt class="col-sm-3">Diện tích</dt>
+        <dd class="col-sm-9">@FormatHelper.Number(Model.DienTich) m2</dd>
+        <dt class="col-sm-3">Giá thuê cơ sở</dt>
+        <dd class="col-sm-9">@FormatHelper.Money(Model.GiaThueCoSo)</dd>
+        <dt class="col-sm-3">Sức chứa tối đa</dt>
+        <dd class="col-sm-9">@Model.SucChuaToiDa</dd>
+    </dl>
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaLoaiPhong">Sửa</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+    </div>
+</div>

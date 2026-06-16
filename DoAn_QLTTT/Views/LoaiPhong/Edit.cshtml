@@ -1,0 +1,12 @@
+@model LoaiPhongFormViewModel
+@{
+    ViewData["Title"] = "Sửa loại phòng";
+}
+
+<form asp-action="Edit" method="post" class="form-panel">
+    @await Html.PartialAsync("_Form", Model)
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
