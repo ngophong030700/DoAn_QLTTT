@@ -18,9 +18,9 @@
                 <th>Phòng</th>
                 <th>Dịch vụ</th>
                 <th>Tháng/Năm</th>
-                <th>Chỉ số cũ</th>
-                <th>Chỉ số mới</th>
-                <th>Tiêu thụ</th>
+                <th class="text-end">Chỉ số cũ</th>
+                <th class="text-end">Chỉ số mới</th>
+                <th class="text-end">Tiêu thụ</th>
                 <th>Người nhập</th>
                 <th></th>
             </tr>
@@ -29,12 +29,12 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.SoPhong</td>
+                    <td class="fw-semibold">@item.SoPhong</td>
                     <td>@item.DichVuTen</td>
                     <td>@item.Thang/@item.Nam</td>
-                    <td>@FormatHelper.Number(item.ChiSoCu)</td>
-                    <td>@FormatHelper.Number(item.ChiSoMoi)</td>
-                    <td class="fw-semibold">@FormatHelper.Number(item.TieuThu)</td>
+                    <td class="text-end monospace-data">@FormatHelper.Number(item.ChiSoCu)</td>
+                    <td class="text-end monospace-data">@FormatHelper.Number(item.ChiSoMoi)</td>
+                    <td class="text-end fw-semibold monospace-data">@FormatHelper.Number(item.TieuThu)</td>
                     <td>@item.NguoiNhapHoTen</td>
                     <td class="action-cell text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.MaChiSo">Xem</a>

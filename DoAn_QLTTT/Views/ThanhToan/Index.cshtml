@@ -18,7 +18,7 @@
                 <th>Mã</th>
                 <th>Hóa đơn</th>
                 <th>Người thu</th>
-                <th>Số tiền</th>
+                <th class="text-end">Số tiền</th>
                 <th>Ngày thu</th>
                 <th>Hình thức</th>
                 <th></th>
@@ -28,10 +28,10 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>#@item.MaThanhToan</td>
+                    <td class="monospace-data">#@item.MaThanhToan</td>
                     <td>@item.HoaDonMoTa</td>
                     <td>@item.NguoiThuHoTen</td>
-                    <td class="fw-semibold">@FormatHelper.Money(item.SoTien)</td>
+                    <td class="text-end fw-semibold monospace-data">@FormatHelper.Money(item.SoTien)</td>
                     <td>@item.NgayThu.ToString("dd/MM/yyyy")</td>
                     <td>@item.HinhThuc</td>
                     <td class="action-cell text-end">

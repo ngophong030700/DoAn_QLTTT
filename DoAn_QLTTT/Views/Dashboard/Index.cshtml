@@ -1,82 +1,125 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Tổng quan";
 }
 
-<div class="row g-3 mb-4">
+@* <div class="welcome-banner mb-4 p-4 rounded-4" style="background: linear-gradient(135deg, #001f3d 0%, #004d80 100%); color: white; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 31, 61, 0.2);">
+    <div style="position: relative; z-index: 2;">
+        <h1 class="display-6 fw-800 mb-1" style="letter-spacing: -1px;">Chào mừng trở lại, @ViewBag.CurrentUserName! 👋</h1>
+        <p class="opacity-75 mb-0">Hôm nay là @DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN")). Chúc bạn một ngày làm việc hiệu quả.</p>
+    </div>
+    <div style="position: absolute; right: -50px; bottom: -50px; font-size: 200px; opacity: 0.1; color: white; pointer-events: none;">
+        <i class="bi bi-buildings"></i>
+    </div>
+</div> *@
+
+<div class="row g-4 mb-4">
     <div class="col-md-6 col-xl-3">
         <div class="stat-card">
-            <div class="stat-label">Tổng số phòng</div>
-            <div class="stat-value">@Model.TongSoPhong</div>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Tổng số phòng</div>
+                    <div class="stat-value">@Model.TongSoPhong</div>
+                </div>
+                <div style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--uit-blue-light); font-size: 1.5rem;">
+                    <i class="bi bi-door-closed"></i>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Phòng trống</div>
-            <div class="stat-value">@Model.PhongTrong</div>
+        <div class="stat-card" style="border-left-color: var(--neon-green);">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Phòng trống</div>
+                    <div class="stat-value text-success">@Model.PhongTrong</div>
+                </div>
+                <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--neon-green); font-size: 1.5rem;">
+                    <i class="bi bi-door-open"></i>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Phòng đang thuê</div>
-            <div class="stat-value">@Model.PhongDangThue</div>
+        <div class="stat-card" style="border-left-color: var(--uit-blue-light);">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Đang thuê</div>
+                    <div class="stat-value text-primary">@Model.PhongDangThue</div>
+                </div>
+                <div style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--uit-blue-light); font-size: 1.5rem;">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Hóa đơn chưa thanh toán</div>
-            <div class="stat-value">@Model.HoaDonChuaThanhToan</div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Hóa đơn quá hạn</div>
-            <div class="stat-value">@Model.HoaDonQuaHan</div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Doanh thu tháng</div>
-            <div class="stat-value">@FormatHelper.Money(Model.DoanhThuThang)</div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-            <div class="stat-label">Tổng công nợ</div>
-            <div class="stat-value">@FormatHelper.Money(Model.TongCongNo)</div>
+        <div class="stat-card" style="border-left-color: var(--neon-red);">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-label">Hóa đơn nợ</div>
+                    <div class="stat-value text-danger">@Model.HoaDonChuaThanhToan</div>
+                </div>
+                <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--neon-red); font-size: 1.5rem;">
+                    <i class="bi bi-exclamation-circle"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="table-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h5 fw-800 mb-0"><i class="bi bi-bar-chart-line-fill me-2" style="color: var(--uit-blue-light)"></i>Xu hướng doanh thu</h2>
+                <span class="text-muted small fw-600">6 tháng gần nhất</span>
+            </div>
+            <div style="position: relative; height: 350px; width: 100%;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="table-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h5 fw-800 mb-0"><i class="bi bi-pie-chart-fill me-2" style="color: var(--uit-orange)"></i>Trạng thái phòng</h2>
+                <span class="badge bg-light text-dark fw-700">Tỉ lệ lấp đầy: @(Model.TongSoPhong > 0 ? (Model.PhongDangThue * 100 / Model.TongSoPhong) : 0)%</span>
+            </div>
+            <div style="position: relative; height: 350px; width: 100%;">
+                <canvas id="occupancyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
     <div class="col-xl-8">
         <div class="table-card">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h2 class="h6 mb-0">Hóa đơn gần đây</h2>
-                <a class="btn btn-sm btn-outline-primary" asp-controller="HoaDon" asp-action="Index">Xem tất cả</a>
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+                <h2 class="h6 mb-0 fw-800 text-uppercase letter-spacing-05"><i class="bi bi-clock-history me-2 text-primary"></i>Hóa đơn gần đây</h2>
+                <a class="btn btn-sm btn-outline-primary" asp-controller="HoaDon" asp-action="Index">Tất cả <i class="bi bi-arrow-right ms-1"></i></a>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
                         <tr>
-                            <th>Mã</th>
-                            <th>Hợp đồng</th>
-                            <th>Tháng/Năm</th>
-                            <th>Tổng tiền</th>
-                            <th>Còn lại</th>
-                            <th>Trạng thái</th>
+                            <th style="width: 80px;">Mã</th>
+                            <th>Mô tả</th>
+                            <th>Thời gian</th>
+                            <th class="text-end">Tổng tiền</th>
+                            <th class="text-center">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.HoaDonGanDay)
                         {
                             <tr>
-                                <td>#@item.MaHoaDon</td>
-                                <td>@item.HopDongMoTa</td>
-                                <td>@item.Thang/@item.Nam</td>
-                                <td>@FormatHelper.Money(item.TongTien)</td>
-                                <td>@FormatHelper.Money(item.ConLai)</td>
-                                <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
+                                <td class="fw-700 text-primary">#@item.MaHoaDon</td>
+                                <td class="fw-600">@item.HopDongMoTa</td>
+                                <td class="text-muted small">Tháng @item.Thang/@item.Nam</td>
+                                <td class="text-end fw-700">@FormatHelper.Money(item.TongTien)</td>
+                                <td class="text-center"><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
                             </tr>
                         }
                     </tbody>
@@ -86,25 +129,29 @@
     </div>
     <div class="col-xl-4">
         <div class="table-card">
-            <div class="p-3 border-bottom">
-                <h2 class="h6 mb-0">Phòng đang thuê</h2>
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+                <h2 class="h6 mb-0 fw-800 text-uppercase letter-spacing-05"><i class="bi bi-door-closed me-2 text-primary"></i>Phòng đang thuê</h2>
+                <a class="btn btn-sm btn-outline-primary" asp-controller="PhongTro" asp-action="Index">Chi tiết</a>
             </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
                         <tr>
                             <th>Phòng</th>
-                            <th>Loại</th>
-                            <th>Giá thuê</th>
+                            <th class="text-end">Giá thuê</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.PhongDangThueList)
                         {
                             <tr>
-                                <td>@item.SoPhong</td>
-                                <td>@item.LoaiPhongTen</td>
-                                <td>@FormatHelper.Money(item.GiaThue)</td>
+                                <td class="fw-semibold">
+                                    <div class="d-flex align-items-center">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--neon-green); margin-right: 10px;"></div>
+                                        @item.SoPhong
+                                    </div>
+                                </td>
+                                <td class="text-end fw-700">@FormatHelper.Money(item.GiaThue)</td>
                             </tr>
                         }
                     </tbody>
@@ -113,3 +160,139 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Helper for gradients
+            function getGradient(ctx, color1, color2) {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, color1);
+                gradient.addColorStop(1, color2);
+                return gradient;
+            }
+
+            // Setup Revenue Chart
+            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+            const blueGradient = getGradient(ctxRevenue, 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.1)');
+            
+            new Chart(ctxRevenue, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.MonthlyRevenueLabels)),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: @Html.Raw(Json.Serialize(Model.MonthlyRevenueValues)),
+                        backgroundColor: blueGradient,
+                        borderColor: 'var(--uit-blue-light)',
+                        borderWidth: 1.5,
+                        borderRadius: 4,
+                        hoverBackgroundColor: 'var(--uit-blue-light)',
+                        hoverBorderColor: 'var(--uit-blue-light)',
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Doanh thu: ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(15, 23, 42, 0.04)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 10, weight: '600' },
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 10, weight: '600' },
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Setup Room Occupancy Chart
+            const ctxOccupancy = document.getElementById('occupancyChart').getContext('2d');
+            new Chart(ctxOccupancy, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Trống', 'Đang thuê', 'Bảo trì'],
+                    datasets: [{
+                        data: [@Model.PhongTrong, @Model.PhongDangThue, @Model.PhongBaoTri],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.85)',
+                            'rgba(59, 130, 246, 0.85)',
+                            'rgba(245, 158, 11, 0.85)'
+                        ],
+                        hoverBackgroundColor: [
+                            '#10b981',
+                            '#3b82f6',
+                            '#f59e0b'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        offset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15,
+                                font: { size: 11, weight: '700' },
+                                color: '#475569'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#475569',
+                            borderColor: 'rgba(15, 23, 42, 0.05)',
+                            borderWidth: 1,
+                            padding: 10,
+                            bodyFont: { weight: '700' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

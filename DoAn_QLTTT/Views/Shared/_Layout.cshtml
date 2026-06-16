@@ -7,46 +7,86 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Quản lý thuê phòng trọ</title>
+    <title>@ViewData["Title"] - UIT Hostels Management</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAn_QLTTT.styles.css" asp-append-version="true" />
 </head>
 <body class="admin-shell">
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-mark">PT</div>
+            <img class="brand-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/0/00/Logo_UIT_updated.svg" alt="UIT Logo" />
             <div>
-                <div class="brand-title">QL Phòng Trọ</div>
-                <div class="brand-subtitle">Demo đồ án</div>
+                <div class="brand-title">Quản lý phòng trọ</div>
             </div>
         </div>
 
         <nav class="sidebar-nav">
-            <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-            <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">Loại phòng</a>
-            <a class="@Active("PhongTro")" asp-controller="PhongTro" asp-action="Index">Phòng trọ</a>
-            <a class="@Active("KhachThue")" asp-controller="KhachThue" asp-action="Index">Khách thuê</a>
-            <a class="@Active("HopDong")" asp-controller="HopDong" asp-action="Index">Hợp đồng</a>
-            <a class="@Active("DichVu")" asp-controller="DichVu" asp-action="Index">Dịch vụ</a>
-            <a class="@Active("ChiSoDienNuoc")" asp-controller="ChiSoDienNuoc" asp-action="Index">Chỉ số điện/nước</a>
-            <a class="@Active("HoaDon")" asp-controller="HoaDon" asp-action="Index">Hóa đơn</a>
-            <a class="@Active("ThanhToan")" asp-controller="ThanhToan" asp-action="Index">Thanh toán</a>
-            <a class="@Active("NhacNo")" asp-controller="NhacNo" asp-action="Index">Nhắc nợ</a>
-            <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">Người dùng</a>
+            <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">
+                <i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span>
+            </a>
+            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Quản lý phòng</div>
+            <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">
+                <i class="bi bi-collection-fill"></i><span>Loại phòng</span>
+            </a>
+            <a class="@Active("PhongTro")" asp-controller="PhongTro" asp-action="Index">
+                <i class="bi bi-door-open-fill"></i><span>Phòng trọ</span>
+            </a>
+            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Khách hàng & HĐ</div>
+            <a class="@Active("KhachThue")" asp-controller="KhachThue" asp-action="Index">
+                <i class="bi bi-people-fill"></i><span>Khách thuê</span>
+            </a>
+            <a class="@Active("HopDong")" asp-controller="HopDong" asp-action="Index">
+                <i class="bi bi-file-earmark-check-fill"></i><span>Hợp đồng</span>
+            </a>
+            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dịch vụ & Hóa đơn</div>
+            <a class="@Active("DichVu")" asp-controller="DichVu" asp-action="Index">
+                <i class="bi bi-lightning-charge-fill"></i><span>Dịch vụ</span>
+            </a>
+            <a class="@Active("ChiSoDienNuoc")" asp-controller="ChiSoDienNuoc" asp-action="Index">
+                <i class="bi bi-speedometer2"></i><span>Số điện/nước</span>
+            </a>
+            <a class="@Active("HoaDon")" asp-controller="HoaDon" asp-action="Index">
+                <i class="bi bi-receipt"></i><span>Hóa đơn</span>
+            </a>
+            <a class="@Active("ThanhToan")" asp-controller="ThanhToan" asp-action="Index">
+                <i class="bi bi-wallet2"></i><span>Thanh toán</span>
+            </a>
+            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Hệ thống</div>
+            <a class="@Active("NhacNo")" asp-controller="NhacNo" asp-action="Index">
+                <i class="bi bi-bell-fill"></i><span>Nhắc nợ</span>
+            </a>
+            <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">
+                <i class="bi bi-shield-lock-fill"></i><span>Bảo mật</span>
+            </a>
         </nav>
     </aside>
 
     <div class="main-panel">
-        <nav class="navbar navbar-expand bg-white border-bottom admin-topbar">
+        <nav class="navbar navbar-expand admin-topbar">
             <div class="container-fluid">
-                <div>
+                <div class="d-none d-lg-block">
                     <div class="topbar-title">@ViewData["Title"]</div>
-                    <div class="topbar-subtitle">Hệ thống Web quản lý thuê phòng trọ</div>
+                    <div class="topbar-subtitle">Hệ thống Quản lý phòng trọ</div>
                 </div>
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    <span class="badge text-bg-dark">@ViewBag.CurrentUserRole</span>
-                    <span class="text-muted small">@ViewBag.CurrentUserName</span>
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <div class="topbar-icon-btn d-none d-md-flex" style="background: rgba(15, 23, 42, 0.04); width: 40px; height: 40px; border-radius: 10px; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer;">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <div class="topbar-icon-btn d-none d-md-flex" style="background: rgba(15, 23, 42, 0.04); width: 40px; height: 40px; border-radius: 10px; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; position: relative;">
+                        <i class="bi bi-bell"></i>
+                        <span style="position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: var(--neon-red); border-radius: 50%; border: 2px solid white;"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="d-flex flex-column align-items-end d-none d-sm-flex">
+                            <span class="user-name-text">@ViewBag.CurrentUserName</span>
+                            <span class="badge badge-user-role" style="background-color: var(--uit-blue-light) !important; color: white !important;">@ViewBag.CurrentUserRole</span>
+                        </div>
+                        <div class="user-avatar" style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--uit-blue-light) 0%, #2563eb 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
+                            @(ViewBag.CurrentUserName?.ToString()?.Substring(0, 1) ?? "A")
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -55,14 +95,14 @@
             @if (TempData["SuccessMessage"] is not null)
             {
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["SuccessMessage"]
+                    <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                 </div>
             }
             @if (TempData["ErrorMessage"] is not null)
             {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["ErrorMessage"]
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
                 </div>
             }

@@ -7,8 +7,8 @@ public abstract class AdminControllerBase : Controller
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        ViewBag.CurrentUserName = "Admin Demo";
-        ViewBag.CurrentUserRole = "Admin";
+        ViewBag.CurrentUserName = "Chủ nhà trọ";
+        ViewBag.CurrentUserRole = "Chủ trọ";
         base.OnActionExecuting(context);
     }
 }

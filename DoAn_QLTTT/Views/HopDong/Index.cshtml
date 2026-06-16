@@ -20,8 +20,8 @@
                 <th>Khách đại diện</th>
                 <th>Ngày bắt đầu</th>
                 <th>Ngày kết thúc</th>
-                <th>Tiền thuê</th>
-                <th>Tiền cọc</th>
+                <th class="text-end">Tiền thuê</th>
+                <th class="text-end">Tiền cọc</th>
                 <th>Trạng thái</th>
                 <th></th>
             </tr>
@@ -30,13 +30,13 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>#@item.MaHopDong</td>
+                    <td class="monospace-data">#@item.MaHopDong</td>
                     <td>@item.SoPhong</td>
                     <td>@item.KhachDaiDienHoTen</td>
-                    <td>@item.NgayBatDau.ToString("dd/MM/yyyy")</td>
-                    <td>@(item.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "")</td>
-                    <td>@FormatHelper.Money(item.TienThueThang)</td>
-                    <td>@FormatHelper.Money(item.TienCoc)</td>
+                    <td class="monospace-data">@item.NgayBatDau.ToString("dd/MM/yyyy")</td>
+                    <td class="monospace-data">@(item.NgayKetThuc?.ToString("dd/MM/yyyy") ?? "")</td>
+                    <td class="text-end monospace-data">@FormatHelper.Money(item.TienThueThang)</td>
+                    <td class="text-end monospace-data">@FormatHelper.Money(item.TienCoc)</td>
                     <td><span class="badge @BadgeHelper.HopDongStatusClass(item.TrangThai)">@item.TrangThai</span></td>
                     <td class="action-cell text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.MaHopDong">Xem</a>

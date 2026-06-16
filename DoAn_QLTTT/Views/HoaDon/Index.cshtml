@@ -23,9 +23,9 @@
                 <th>Mã</th>
                 <th>Hợp đồng</th>
                 <th>Tháng/Năm</th>
-                <th>Tổng tiền</th>
-                <th>Đã thanh toán</th>
-                <th>Còn lại</th>
+                <th class="text-end">Tổng tiền</th>
+                <th class="text-end">Đã thanh toán</th>
+                <th class="text-end">Còn lại</th>
                 <th>Hạn thanh toán</th>
                 <th>Trạng thái</th>
                 <th></th>
@@ -35,12 +35,12 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>#@item.MaHoaDon</td>
+                    <td class="monospace-data">#@item.MaHoaDon</td>
                     <td>@item.HopDongMoTa</td>
                     <td>@item.Thang/@item.Nam</td>
-                    <td>@FormatHelper.Money(item.TongTien)</td>
-                    <td>@FormatHelper.Money(item.DaThanhToan)</td>
-                    <td class="fw-semibold">@FormatHelper.Money(item.ConLai)</td>
+                    <td class="text-end monospace-data">@FormatHelper.Money(item.TongTien)</td>
+                    <td class="text-end monospace-data">@FormatHelper.Money(item.DaThanhToan)</td>
+                    <td class="text-end fw-semibold monospace-data">@FormatHelper.Money(item.ConLai)</td>
                     <td>@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
                     <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
                     <td class="action-cell text-end">

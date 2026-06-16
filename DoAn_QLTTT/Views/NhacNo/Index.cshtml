@@ -24,7 +24,7 @@
                 <th>Khách</th>
                 <th>Tháng/Năm</th>
                 <th>Hạn thanh toán</th>
-                <th>Còn lại</th>
+                <th class="text-end">Còn lại</th>
                 <th>Trạng thái</th>
                 <th></th>
             </tr>
@@ -33,12 +33,12 @@
             @foreach (var item in Model.HoaDonQuaHans)
             {
                 <tr>
-                    <td>#@item.MaHoaDon</td>
+                    <td class="monospace-data">#@item.MaHoaDon</td>
                     <td>@item.HopDongMoTa</td>
                     <td>@item.KhachDaiDienHoTen</td>
                     <td>@item.Thang/@item.Nam</td>
-                    <td>@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
-                    <td class="fw-semibold">@FormatHelper.Money(item.ConLai)</td>
+                    <td class="monospace-data">@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end fw-semibold monospace-data">@FormatHelper.Money(item.ConLai)</td>
                     <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-controller="HoaDon" asp-action="Details" asp-route-id="@item.MaHoaDon">Xem hóa đơn</a>

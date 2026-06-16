@@ -1,8 +1,51 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="col-lg-8 text-center">
+        <div class="mb-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Logo_UIT_updated.svg" alt="UIT Logo" style="height: 120px; filter: drop-shadow(0 10px 15px rgba(59, 130, 246, 0.2));" />
+        </div>
+        <h1 class="display-3 fw-800 mb-3" style="background: linear-gradient(135deg, var(--uit-navy) 0%, var(--uit-blue-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px;">
+            UIT Room Hub
+        </h1>
+        <p class="lead text-secondary mb-5 fw-500">
+            Hệ thống quản lý khu trọ thông minh, hiện đại và tối ưu nhất dành cho bạn.<br />
+            Quản lý phòng, khách thuê, hợp đồng và hóa đơn chỉ trong một nền tảng duy nhất.
+        </p>
+        
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg px-5 py-3 rounded-4 shadow-lg">
+                <i class="bi bi-speedometer2 me-2"></i> Đi đến Dashboard
+            </a>
+            <a asp-controller="PhongTro" asp-action="Index" class="btn btn-outline-primary btn-lg px-5 py-3 rounded-4">
+                <i class="bi bi-door-open me-2"></i> Xem danh sách phòng
+            </a>
+        </div>
+
+        <div class="row mt-5 g-4 text-start">
+            <div class="col-md-4">
+                <div class="form-panel h-100 p-4">
+                    <div class="fs-2 text-primary mb-2"><i class="bi bi-shield-check"></i></div>
+                    <h3 class="h5 fw-800 border-0 mb-2">Bảo mật & An toàn</h3>
+                    <p class="text-muted small mb-0">Dữ liệu được quản lý tập trung và bảo mật tuyệt đối với hệ thống phân quyền thông minh.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-panel h-100 p-4">
+                    <div class="fs-2 text-primary mb-2"><i class="bi bi-lightning-charge"></i></div>
+                    <h3 class="h5 fw-800 border-0 mb-2">Nhanh chóng</h3>
+                    <p class="text-muted small mb-0">Thao tác mượt mà, tốc độ xử lý nhanh giúp tiết kiệm thời gian quản lý vận hành.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-panel h-100 p-4">
+                    <div class="fs-2 text-primary mb-2"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h3 class="h5 fw-800 border-0 mb-2">Báo cáo chi tiết</h3>
+                    <p class="text-muted small mb-0">Theo dõi doanh thu, công nợ và tình trạng phòng thông qua các biểu đồ trực quan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
