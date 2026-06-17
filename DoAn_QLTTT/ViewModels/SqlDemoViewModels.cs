@@ -22,6 +22,7 @@ public class SqlDemoScenarioViewModel
     public string Type { get; set; } = "";
     public string Problem { get; set; } = "";
     public string SqlScript { get; set; } = "";
+    public string ObjectScript { get; set; } = "";
     public string Note { get; set; } = "";
     public bool HasExecuted { get; set; }
     public string? OutputTitle { get; set; }

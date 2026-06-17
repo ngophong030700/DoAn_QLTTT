@@ -32,6 +32,7 @@ public class MockSqlDemoService : ISqlDemoService
         var definition = SqlDemoScenarioCatalog.Find(id);
         var model = BuildMockScenario(definition, execute);
         model.SqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName);
+        model.ObjectScript = await _scriptReader.ReadAsync(definition.ObjectScriptFileName);
         return model;
     }
 

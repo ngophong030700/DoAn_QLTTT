@@ -20,9 +20,15 @@ public class SqlDemoController : AdminControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Execute(string id)
+    public async Task<IActionResult> Execute(string id, string? sqlScript)
     {
-        return View("Index", await BuildPageAsync(id, execute: true));
+        var model = await BuildPageAsync(id, execute: true);
+        if (model.SelectedScenario is not null && !string.IsNullOrWhiteSpace(sqlScript))
+        {
+            model.SelectedScenario.SqlScript = sqlScript;
+        }
+
+        return View("Index", model);
     }
 
     private async Task<SqlDemoPageViewModel> BuildPageAsync(string? id, bool execute)

@@ -1,7 +1,21 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Tổng quan";
+    ViewData["Title"] = "Báo cáo";
+    var isMockData = ViewBag.IsMockData is bool value ? value : true;
+    var dataProvider = ViewBag.DataProvider?.ToString() ?? "Mock";
 }
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+    <div>
+        <h1 class="h4 fw-800 mb-1">Báo cáo</h1>
+        <div class="text-muted fw-600">
+            Trình bày báo cáo/biểu đồ từ dữ liệu provider hiện tại; khi có SQL Server sẽ đổi cấu hình DataProvider.
+        </div>
+    </div>
+    <span class="badge @(isMockData ? "bg-warning text-dark" : "bg-primary")">
+        Nguồn dữ liệu: @(isMockData ? "Mock Data" : dataProvider)
+    </span>
+</div>
 
 @* <div class="welcome-banner mb-4 p-4 rounded-4" style="background: linear-gradient(135deg, #001f3d 0%, #004d80 100%); color: white; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 31, 61, 0.2);">
     <div style="position: relative; z-index: 2;">

@@ -45,7 +45,8 @@ public class SqlDemoService : ISqlDemoService
             Problem = definition.Problem,
             Note = definition.Note,
             HasExecuted = execute,
-            SqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName)
+            SqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName),
+            ObjectScript = await _scriptReader.ReadAsync(definition.ObjectScriptFileName)
         };
 
         try

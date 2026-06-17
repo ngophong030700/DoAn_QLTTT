@@ -4,27 +4,10 @@
     var scenario = Model.SelectedScenario;
 }
 
-@functions {
-    private static string FormatCell(object? value)
-    {
-        return value switch
-        {
-            null => "",
-            decimal number => number.ToString("N0"),
-            double number => number.ToString("N0"),
-            float number => number.ToString("N0"),
-            int number => number.ToString("N0"),
-            long number => number.ToString("N0"),
-            DateTime date => date.ToString("dd/MM/yyyy"),
-            _ => value.ToString() ?? ""
-        };
-    }
-}
-
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
     <div>
         <h1 class="h4 fw-800 mb-1">Demo SQL</h1>
-        <div class="text-muted fw-600">Procedure, trigger, function và cursor theo format B1-B5</div>
+        <div class="text-muted fw-600">Procedure, trigger, function và cursor</div>
     </div>
     <span class="badge @(Model.IsMock ? "bg-warning text-dark" : "bg-primary")">
         Nguồn dữ liệu: @(Model.IsMock ? "Mock Data" : "SQL Server")
@@ -63,71 +46,97 @@
     <div class="col-xl-9">
         @if (scenario is not null)
         {
-            <div class="table-card mb-4">
-                <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center gap-2">
+            <section class="table-card mb-4">
+                <div class="p-3 border-bottom bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <div>
-                        <h2 class="h6 mb-1 fw-800">@scenario.Title</h2>
+                        <h2 class="h6 mb-1 fw-800 text-uppercase">Bài toán</h2>
+                        <div class="fw-700">@scenario.Title</div>
+                    </div>
+                    <div>
                         <span class="badge bg-light text-dark">@scenario.Type</span>
                         @if (Model.IsMock)
                         {
-                            <span class="badge bg-warning text-dark ms-1">Đang chạy bằng Mock Data - sẽ thay bằng SQL Server khi có database thật</span>
+                            <span class="badge bg-warning text-dark ms-1">Mock Data</span>
                         }
                     </div>
                 </div>
                 <div class="p-3">
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B1: Trình bày bài toán</div>
-                        <p class="mb-0 fw-600">@scenario.Problem</p>
+                    <p class="mb-0 fw-600">@scenario.Problem</p>
+                    @if (!string.IsNullOrWhiteSpace(scenario.Note))
+                    {
                         <div class="text-muted mt-2">@scenario.Note</div>
-                    </div>
+                    }
+                </div>
+            </section>
 
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B2: Trình bày câu truy vấn SQL</div>
-                        <pre class="bg-dark text-light rounded-2 p-3 mb-0" style="white-space: pre-wrap;"><code>@scenario.SqlScript</code></pre>
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B3: Trình bày bảng dữ liệu liên quan trước khi chạy</div>
-                        @await Html.PartialAsync("_SqlDemoTables", scenario.BeforeTables)
-                    </div>
-
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B4: Nút thực thi</div>
-                        <form asp-controller="SqlDemo" asp-action="Execute" method="post">
+            <section class="table-card mb-4">
+                <form asp-controller="SqlDemo" asp-action="Execute" method="post">
+                    <div class="p-3 border-bottom bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h2 class="h6 mb-0 fw-800 text-uppercase">Câu truy vấn</h2>
+                        <div>
                             <input type="hidden" name="id" value="@scenario.Id" />
                             <button class="btn btn-primary" type="submit">
                                 <i class="bi bi-play-fill me-1"></i>Thực thi
                             </button>
-                        </form>
+                        </div>
                     </div>
-
-                    <div>
-                        <div class="stat-label mb-2">B5: Trình bày bảng dữ liệu sau khi chạy hoặc output</div>
-                        @if (!string.IsNullOrWhiteSpace(scenario.ErrorMessage))
-                        {
-                            <div class="alert alert-danger mb-0">@scenario.ErrorMessage</div>
-                        }
-                        else if (!scenario.HasExecuted)
-                        {
-                            <div class="alert alert-info mb-0">Bấm Thực thi để xem dữ liệu sau khi chạy.</div>
-                        }
-                        else
-                        {
-                            @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle) || !string.IsNullOrWhiteSpace(scenario.OutputMessage))
-                            {
-                                <div class="alert alert-success">
-                                    @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle))
-                                    {
-                                        <div class="fw-800">@scenario.OutputTitle</div>
-                                    }
-                                    @scenario.OutputMessage
+                    <div class="p-3">
+                        <div class="row g-3 align-items-stretch">
+                            <div class="col-lg-6 d-flex">
+                                <div class="sql-code-frame">
+                                    <label class="sql-code-title" for="sqlScript">Câu lệnh demo</label>
+                                    <textarea class="sql-code-block sql-code-editor" id="sqlScript" name="sqlScript" spellcheck="false">@scenario.SqlScript</textarea>
                                 </div>
-                            }
-                            @await Html.PartialAsync("_SqlDemoTables", scenario.AfterTables)
-                        }
+                            </div>
+                            <div class="col-lg-6 d-flex">
+                                <div class="sql-code-frame">
+                                    <div class="sql-code-title">Nội dung @scenario.Type</div>
+                                    <pre class="sql-code-block"><code>@scenario.ObjectScript</code></pre>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </form>
+            </section>
+
+            <section class="table-card mb-4">
+                <div class="p-3 border-bottom bg-white">
+                    <h2 class="h6 mb-0 fw-800 text-uppercase">Dữ liệu liên quan</h2>
                 </div>
-            </div>
+                <div class="p-3">
+                    @await Html.PartialAsync("_SqlDemoTables", scenario.BeforeTables)
+                </div>
+            </section>
+
+            <section class="table-card mb-4">
+                <div class="p-3 border-bottom bg-white">
+                    <h2 class="h6 mb-0 fw-800 text-uppercase">Kết quả sau khi chạy</h2>
+                </div>
+                <div class="p-3">
+                    @if (!string.IsNullOrWhiteSpace(scenario.ErrorMessage))
+                    {
+                        <div class="alert alert-danger mb-0">@scenario.ErrorMessage</div>
+                    }
+                    else if (!scenario.HasExecuted)
+                    {
+                        <div class="alert alert-info mb-0">Bấm Thực thi để xem dữ liệu sau khi chạy.</div>
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle) || !string.IsNullOrWhiteSpace(scenario.OutputMessage))
+                        {
+                            <div class="alert alert-success">
+                                @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle))
+                                {
+                                    <div class="fw-800">@scenario.OutputTitle</div>
+                                }
+                                @scenario.OutputMessage
+                            </div>
+                        }
+                        @await Html.PartialAsync("_SqlDemoTables", scenario.AfterTables)
+                    }
+                </div>
+            </section>
         }
     </div>
 </div>

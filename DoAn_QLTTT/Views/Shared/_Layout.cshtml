@@ -23,46 +23,48 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">
-                <i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span>
-            </a>
-            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Quản lý phòng</div>
-            <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">
-                <i class="bi bi-collection-fill"></i><span>Loại phòng</span>
-            </a>
-            <a class="@Active("PhongTro")" asp-controller="PhongTro" asp-action="Index">
-                <i class="bi bi-door-open-fill"></i><span>Phòng trọ</span>
-            </a>
-            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Khách hàng & HĐ</div>
-            <a class="@Active("KhachThue")" asp-controller="KhachThue" asp-action="Index">
-                <i class="bi bi-people-fill"></i><span>Khách thuê</span>
-            </a>
-            <a class="@Active("HopDong")" asp-controller="HopDong" asp-action="Index">
-                <i class="bi bi-file-earmark-check-fill"></i><span>Hợp đồng</span>
-            </a>
-            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Dịch vụ & Hóa đơn</div>
-            <a class="@Active("DichVu")" asp-controller="DichVu" asp-action="Index">
-                <i class="bi bi-lightning-charge-fill"></i><span>Dịch vụ</span>
-            </a>
-            <a class="@Active("ChiSoDienNuoc")" asp-controller="ChiSoDienNuoc" asp-action="Index">
-                <i class="bi bi-speedometer2"></i><span>Số điện/nước</span>
-            </a>
-            <a class="@Active("HoaDon")" asp-controller="HoaDon" asp-action="Index">
-                <i class="bi bi-receipt"></i><span>Hóa đơn</span>
-            </a>
-            <a class="@Active("ThanhToan")" asp-controller="ThanhToan" asp-action="Index">
-                <i class="bi bi-wallet2"></i><span>Thanh toán</span>
-            </a>
-            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Hệ thống</div>
-            <a class="@Active("NhacNo")" asp-controller="NhacNo" asp-action="Index">
-                <i class="bi bi-bell-fill"></i><span>Nhắc nợ</span>
-            </a>
-            <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">
-                <i class="bi bi-shield-lock-fill"></i><span>Bảo mật</span>
-            </a>
             <a class="@Active("SqlDemo")" asp-controller="SqlDemo" asp-action="Index">
                 <i class="bi bi-database-gear"></i><span>Demo SQL</span>
             </a>
+            <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">
+                <i class="bi bi-bar-chart-line-fill"></i><span>Báo cáo</span>
+            </a>
+            <button class="nav-section-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#managementMenu" aria-expanded="false" aria-controls="managementMenu">
+                <span>Danh mục quản lý</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="collapse nav-submenu" id="managementMenu">
+                <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">
+                    <i class="bi bi-collection-fill"></i><span>Loại phòng</span>
+                </a>
+                <a class="@Active("PhongTro")" asp-controller="PhongTro" asp-action="Index">
+                    <i class="bi bi-door-open-fill"></i><span>Phòng trọ</span>
+                </a>
+                <a class="@Active("KhachThue")" asp-controller="KhachThue" asp-action="Index">
+                    <i class="bi bi-people-fill"></i><span>Khách thuê</span>
+                </a>
+                <a class="@Active("HopDong")" asp-controller="HopDong" asp-action="Index">
+                    <i class="bi bi-file-earmark-check-fill"></i><span>Hợp đồng</span>
+                </a>
+                <a class="@Active("DichVu")" asp-controller="DichVu" asp-action="Index">
+                    <i class="bi bi-lightning-charge-fill"></i><span>Dịch vụ</span>
+                </a>
+                <a class="@Active("ChiSoDienNuoc")" asp-controller="ChiSoDienNuoc" asp-action="Index">
+                    <i class="bi bi-speedometer2"></i><span>Số điện/nước</span>
+                </a>
+                <a class="@Active("HoaDon")" asp-controller="HoaDon" asp-action="Index">
+                    <i class="bi bi-receipt"></i><span>Hóa đơn</span>
+                </a>
+                <a class="@Active("ThanhToan")" asp-controller="ThanhToan" asp-action="Index">
+                    <i class="bi bi-wallet2"></i><span>Thanh toán</span>
+                </a>
+                <a class="@Active("NhacNo")" asp-controller="NhacNo" asp-action="Index">
+                    <i class="bi bi-bell-fill"></i><span>Nhắc nợ</span>
+                </a>
+                <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">
+                    <i class="bi bi-shield-lock-fill"></i><span>Bảo mật</span>
+                </a>
+            </div>
         </nav>
     </aside>
 
