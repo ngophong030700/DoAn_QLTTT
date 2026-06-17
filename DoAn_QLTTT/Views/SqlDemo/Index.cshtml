@@ -22,13 +22,13 @@
     </div>
 }
 
-<div class="row g-4">
-    <div class="col-xl-3">
-        <div class="table-card">
+<div class="row g-4 sql-demo-layout">
+    <div class="col-xl-3 sql-demo-pane">
+        <div class="table-card sql-demo-panel sql-demo-scenario-panel">
             <div class="p-3 border-bottom bg-white">
                 <h2 class="h6 mb-0 fw-800 text-uppercase">Kịch bản demo</h2>
             </div>
-            <div class="list-group list-group-flush">
+            <div class="list-group list-group-flush sql-demo-scenario-list">
                 @foreach (var item in Model.Scenarios)
                 {
                     <a class="list-group-item list-group-item-action @(scenario?.Id == item.Id ? "active" : "")"
@@ -43,7 +43,8 @@
         </div>
     </div>
 
-    <div class="col-xl-9">
+    <div class="col-xl-9 sql-demo-pane">
+        <div class="sql-demo-panel sql-demo-content-panel">
         @if (scenario is not null)
         {
             <section class="table-card mb-4">
@@ -138,5 +139,6 @@
                 </div>
             </section>
         }
+        </div>
     </div>
 </div>

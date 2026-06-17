@@ -69,33 +69,6 @@
     </aside>
 
     <div class="main-panel">
-        <nav class="navbar navbar-expand admin-topbar">
-            <div class="container-fluid">
-                <div class="d-none d-lg-block">
-                    <div class="topbar-title">@ViewData["Title"]</div>
-                    <div class="topbar-subtitle">Hệ thống Quản lý phòng trọ</div>
-                </div>
-                <div class="ms-auto d-flex align-items-center gap-3">
-                    <div class="topbar-icon-btn d-none d-md-flex" style="background: rgba(15, 23, 42, 0.04); width: 40px; height: 40px; border-radius: 10px; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer;">
-                        <i class="bi bi-search"></i>
-                    </div>
-                    <div class="topbar-icon-btn d-none d-md-flex" style="background: rgba(15, 23, 42, 0.04); width: 40px; height: 40px; border-radius: 10px; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; position: relative;">
-                        <i class="bi bi-bell"></i>
-                        <span style="position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: var(--neon-red); border-radius: 50%; border: 2px solid white;"></span>
-                    </div>
-                    <div class="user-profile">
-                        <div class="d-flex flex-column align-items-end d-none d-sm-flex">
-                            <span class="user-name-text">@ViewBag.CurrentUserName</span>
-                            <span class="badge badge-user-role" style="background-color: var(--uit-blue-light) !important; color: white !important;">@ViewBag.CurrentUserRole</span>
-                        </div>
-                        <div class="user-avatar" style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--uit-blue-light) 0%, #2563eb 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">
-                            @(ViewBag.CurrentUserName?.ToString()?.Substring(0, 1) ?? "A")
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
         <main role="main" class="content-wrap">
             @if (TempData["SuccessMessage"] is not null)
             {
