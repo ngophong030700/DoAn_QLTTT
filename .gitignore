@@ -7,19 +7,5 @@ DoAn_QLTTT/obj/
 DoAn_QLTTT/App_Data/DataProtectionKeys/
 /DoAn_QLTTT/appsettings.json
 /DoAn_QLTTT/appsettings.json
-/DoAn_QLTTT/SqlScripts/DemoSql/01_sp_HopDong_Insert.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/01_them_khach_thue.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/02_lap_hop_dong.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/02_trg_HopDong_UpdatePhong.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/03_ghi_chi_so.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/03_trg_ChiTietHoaDon_UpdateTongTien.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/04_lap_hoa_don_thang.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/04_sp_ThanhToan_Insert.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/05_fn_TinhCongNo.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/05_ghi_nhan_thanh_toan.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/06_sp_HoaDon_QuetQuaHan.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/06_tinh_cong_no_hop_dong.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/07_quet_hoa_don_qua_han.sql
-/DoAn_QLTTT/SqlScripts/DemoSql/08_quet_hop_dong_het_han.sql
 /Planning
 /DoAn_QLTTT/Planning Script.txt
