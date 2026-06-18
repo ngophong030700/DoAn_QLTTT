@@ -1,17 +1,18 @@
 using Dapper;
 using DoAn_QLTTT.Data;
 using DoAn_QLTTT.ViewModels;
+using System.Data;
 
 namespace DoAn_QLTTT.Services;
 
 public class SqlDemoService : ISqlDemoService
 {
+    private const string DemoCccd = "079199999999";
+    private const int DemoMonth = 7;
+    private const int DemoYear = 2026;
+
     private readonly DapperContext _context;
     private readonly ISqlScriptReader _scriptReader;
-    private static readonly HashSet<string> Whitelist = SqlDemoScenarioCatalog.Items
-        .Select(x => x.ExecuteName)
-        .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
     public SqlDemoService(DapperContext context, ISqlScriptReader scriptReader)
     {
         _context = context;
@@ -34,9 +35,11 @@ public class SqlDemoService : ISqlDemoService
         return Task.FromResult(items);
     }
 
-    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(string? id, bool execute)
+    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(string? id, bool execute, string? sqlScript = null)
     {
         var definition = SqlDemoScenarioCatalog.Find(id);
+        var defaultSqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName);
+        var effectiveSqlScript = string.IsNullOrWhiteSpace(sqlScript) ? defaultSqlScript : sqlScript;
         var model = new SqlDemoScenarioViewModel
         {
             Id = definition.Id,
@@ -45,7 +48,7 @@ public class SqlDemoService : ISqlDemoService
             Problem = definition.Problem,
             Note = definition.Note,
             HasExecuted = execute,
-            SqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName)
+            SqlScript = effectiveSqlScript
         };
 
         try
@@ -54,22 +57,88 @@ public class SqlDemoService : ISqlDemoService
 
             if (execute)
             {
-                if (!Whitelist.Contains(definition.ExecuteName))
-                {
-                    model.ErrorMessage = "Kịch bản không nằm trong whitelist nên không được thực thi.";
-                    return model;
-                }
-
-                model.OutputMessage = await ExecuteWhitelistedScenarioAsync(definition);
-                model.AfterTables = await LoadPreviewTablesAsync(definition.Id);
+                var outputTables = await ExecuteSubmittedScriptAsync(effectiveSqlScript);
+                model.OutputTitle = "Đã chạy câu SQL trên màn hình";
+                model.OutputMessage = outputTables.Count == 0
+                    ? "Script đã thực thi thành công. Không có result set SELECT trả về."
+                    : $"Script đã thực thi thành công và trả về {outputTables.Count} result set.";
+                model.AfterTables = outputTables.Count > 0
+                    ? outputTables
+                    : await LoadPreviewTablesAsync(definition.Id);
             }
         }
         catch (Exception ex)
         {
-            model.ErrorMessage = $"Chưa thể kết nối hoặc thực thi SQL Server. Kiểm tra DataProvider, connection string và object SQL thật. Chi tiết: {ex.Message}";
+            model.ErrorMessage = $"Chưa thể kết nối hoặc thực thi SQL Server. Kiểm tra DataProvider, connection string, câu SQL và object SQL thật. Chi tiết: {ex.Message}";
         }
 
         return model;
+    }
+
+    private async Task<IReadOnlyList<SqlDemoTableViewModel>> ExecuteSubmittedScriptAsync(string sqlScript)
+    {
+        var batches = SplitSqlBatches(sqlScript).ToList();
+        if (batches.Count == 0)
+        {
+            return [];
+        }
+
+        var tables = new List<SqlDemoTableViewModel>();
+        using var connection = _context.CreateConnection();
+
+        for (var batchIndex = 0; batchIndex < batches.Count; batchIndex++)
+        {
+            using var grid = await connection.QueryMultipleAsync(batches[batchIndex]);
+            var resultIndex = 1;
+
+            while (!grid.IsConsumed)
+            {
+                var rows = (await grid.ReadAsync()).Cast<IDictionary<string, object?>>().ToList();
+                var columns = rows.FirstOrDefault()?.Keys.ToList() ?? [];
+
+                tables.Add(new SqlDemoTableViewModel
+                {
+                    Title = batches.Count == 1
+                        ? $"Kết quả SQL #{resultIndex}"
+                        : $"Kết quả SQL batch {batchIndex + 1}.{resultIndex}",
+                    Columns = columns,
+                    Rows = rows.Select(row => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>(row)).ToList()
+                });
+
+                resultIndex++;
+            }
+        }
+
+        return tables;
+    }
+
+    private static IEnumerable<string> SplitSqlBatches(string sqlScript)
+    {
+        var lines = sqlScript.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        var current = new List<string>();
+
+        foreach (var line in lines)
+        {
+            if (line.Trim().Equals("GO", StringComparison.OrdinalIgnoreCase))
+            {
+                var batch = string.Join(Environment.NewLine, current).Trim();
+                if (!string.IsNullOrWhiteSpace(batch))
+                {
+                    yield return batch;
+                }
+
+                current.Clear();
+                continue;
+            }
+
+            current.Add(line);
+        }
+
+        var lastBatch = string.Join(Environment.NewLine, current).Trim();
+        if (!string.IsNullOrWhiteSpace(lastBatch))
+        {
+            yield return lastBatch;
+        }
     }
 
     private async Task<IReadOnlyList<SqlDemoTableViewModel>> LoadPreviewTablesAsync(string scenarioId)
@@ -77,24 +146,46 @@ public class SqlDemoService : ISqlDemoService
         using var connection = _context.CreateConnection();
         var sql = scenarioId switch
         {
-            "lap-hop-dong" => "SELECT TOP 5 MaPhong, SoPhong, TrangThai FROM PhongTro ORDER BY MaPhong; SELECT TOP 5 MaKhachThue, HoTen, SoDienThoai FROM KhachThue ORDER BY MaKhachThue; SELECT TOP 5 MaHopDong, MaPhong, MaKhachThue, TrangThai FROM HopDong ORDER BY MaHopDong DESC;",
-            "trigger-trang-thai-phong" => "SELECT TOP 5 MaPhong, SoPhong, TrangThai FROM PhongTro ORDER BY MaPhong; SELECT TOP 5 MaHopDong, MaPhong, TrangThai FROM HopDong ORDER BY MaHopDong DESC;",
-            "trigger-tong-tien-hoa-don" => "SELECT TOP 5 MaHoaDon, TongTien, DaThanhToan, ConLai, TrangThai FROM HoaDon ORDER BY MaHoaDon DESC; SELECT TOP 10 MaChiTiet, MaHoaDon, LoaiPhi, ThanhTien FROM ChiTietHoaDon ORDER BY MaChiTiet DESC;",
-            "ghi-nhan-thanh-toan" => "SELECT TOP 5 MaHoaDon, TongTien, DaThanhToan, ConLai, TrangThai FROM HoaDon ORDER BY MaHoaDon DESC; SELECT TOP 5 MaThanhToan, MaHoaDon, SoTien, PhuongThuc FROM ThanhToan ORDER BY MaThanhToan DESC;",
-            "function-tinh-cong-no" => "SELECT TOP 5 MaHoaDon, TongTien, DaThanhToan, ConLai FROM HoaDon ORDER BY MaHoaDon DESC;",
-            "cursor-quet-qua-han" => "SELECT TOP 10 MaHoaDon, HanThanhToan, ConLai, TrangThai FROM HoaDon ORDER BY HanThanhToan;",
+            "them-khach-thue" => $"SELECT MaKhach, HoTen, CCCD, SoDienThoai, DiaChi FROM KHACHTHUE WHERE CCCD = '{DemoCccd}';",
+            "lap-hop-dong" => $"""
+                SELECT TOP 5 MaPhong, SoPhong, GiaThue, SucChuaToiDa, TrangThai FROM PHONGTRO WHERE TrangThai = N'Trống' ORDER BY MaPhong;
+                SELECT TOP 5 MaKhach, HoTen, CCCD, SoDienThoai FROM KHACHTHUE WHERE CCCD = '{DemoCccd}' OR MaKhach IN (SELECT TOP 4 MaKhach FROM KHACHTHUE ORDER BY MaKhach DESC) ORDER BY MaKhach DESC;
+                SELECT TOP 5 MaHopDong, MaPhong, MaKhachDaiDien, NgayBatDau, NgayKetThuc, TienThueThang, TrangThai FROM HOPDONG ORDER BY MaHopDong DESC;
+                SELECT TOP 5 MaHopDong, MaKhach, LaNguoiDaiDien FROM CHITIETHOPDONG ORDER BY MaHopDong DESC;
+                """,
+            "ghi-chi-so" => $"""
+                SELECT MaDichVu, TenDichVu, DonVi, DonGia, LoaiTinhPhi FROM DICHVU WHERE LoaiTinhPhi = 'TheoChiSo' ORDER BY MaDichVu;
+                SELECT TOP 10 CS.MaChiSo, CS.MaPhong, DV.TenDichVu, CS.Thang, CS.Nam, CS.ChiSoCu, CS.ChiSoMoi, CS.TieuThu
+                FROM CHISODIENNUOC CS
+                INNER JOIN DICHVU DV ON CS.MaDichVu = DV.MaDichVu
+                ORDER BY CS.MaChiSo DESC;
+                """,
+            "lap-hoa-don-thang" => $"""
+                SELECT TOP 5 MaHopDong, MaPhong, MaKhachDaiDien, TienThueThang, TrangThai FROM HOPDONG WHERE TrangThai = N'Hiệu lực' ORDER BY MaHopDong DESC;
+                SELECT TOP 10 MaHoaDon, MaHopDong, Thang, Nam, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;
+                SELECT TOP 15 CT.MaChiTiet, CT.MaHoaDon, DV.TenDichVu, CT.MoTa, CT.SoLuong, CT.DonGiaTaiThoiDiem, CT.ThanhTien
+                FROM CHITIETHOADON CT
+                INNER JOIN DICHVU DV ON CT.MaDichVu = DV.MaDichVu
+                ORDER BY CT.MaChiTiet DESC;
+                """,
+            "ghi-nhan-thanh-toan" => "SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON WHERE ConLai > 0 ORDER BY MaHoaDon DESC; SELECT TOP 10 MaThanhToan, MaHoaDon, MaNguoiThu, SoTien, NgayThu, HinhThuc FROM THANHTOAN ORDER BY MaThanhToan DESC;",
+            "tinh-cong-no-hop-dong" => "SELECT TOP 5 HD.MaHopDong, HD.MaPhong, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo FROM HOPDONG HD ORDER BY HD.MaHopDong DESC; SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;",
+            "quet-hoa-don-qua-han" => "SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON WHERE ConLai > 0 ORDER BY HanThanhToan;",
+            "quet-hop-dong-het-han" => "SELECT TOP 10 HD.MaHopDong, HD.MaPhong, P.SoPhong, HD.NgayKetThuc, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo, P.TrangThai AS TrangThaiPhong FROM HOPDONG HD INNER JOIN PHONGTRO P ON HD.MaPhong = P.MaPhong ORDER BY HD.NgayKetThuc;",
             _ => "SELECT 1 AS KetQua;"
         };
 
         using var grid = await connection.QueryMultipleAsync(sql);
         return scenarioId switch
         {
-            "lap-hop-dong" => [await ReadTableAsync(grid, "PhongTro"), await ReadTableAsync(grid, "KhachThue"), await ReadTableAsync(grid, "HopDong")],
-            "trigger-trang-thai-phong" => [await ReadTableAsync(grid, "PhongTro"), await ReadTableAsync(grid, "HopDong")],
-            "trigger-tong-tien-hoa-don" => [await ReadTableAsync(grid, "HoaDon"), await ReadTableAsync(grid, "ChiTietHoaDon")],
-            "ghi-nhan-thanh-toan" => [await ReadTableAsync(grid, "HoaDon"), await ReadTableAsync(grid, "ThanhToan")],
-            "function-tinh-cong-no" => [await ReadTableAsync(grid, "HoaDon")],
-            "cursor-quet-qua-han" => [await ReadTableAsync(grid, "HoaDon")],
+            "them-khach-thue" => [await ReadTableAsync(grid, "Bảng KHACHTHUE")],
+            "lap-hop-dong" => [await ReadTableAsync(grid, "Bảng PHONGTRO"), await ReadTableAsync(grid, "Bảng KHACHTHUE"), await ReadTableAsync(grid, "Bảng HOPDONG"), await ReadTableAsync(grid, "Bảng CHITIETHOPDONG")],
+            "ghi-chi-so" => [await ReadTableAsync(grid, "Bảng DICHVU"), await ReadTableAsync(grid, "Bảng CHISODIENNUOC")],
+            "lap-hoa-don-thang" => [await ReadTableAsync(grid, "Bảng HOPDONG"), await ReadTableAsync(grid, "Bảng HOADON"), await ReadTableAsync(grid, "Bảng CHITIETHOADON")],
+            "ghi-nhan-thanh-toan" => [await ReadTableAsync(grid, "Bảng HOADON"), await ReadTableAsync(grid, "Bảng THANHTOAN")],
+            "tinh-cong-no-hop-dong" => [await ReadTableAsync(grid, "Bảng HOPDONG"), await ReadTableAsync(grid, "Bảng HOADON")],
+            "quet-hoa-don-qua-han" => [await ReadTableAsync(grid, "Bảng HOADON")],
+            "quet-hop-dong-het-han" => [await ReadTableAsync(grid, "Bảng HOPDONG và PHONGTRO")],
             _ => [await ReadTableAsync(grid, "KetQua")]
         };
     }
@@ -112,34 +203,4 @@ public class SqlDemoService : ISqlDemoService
         };
     }
 
-    private async Task<string> ExecuteWhitelistedScenarioAsync(SqlDemoScenarioDefinition definition)
-    {
-        using var connection = _context.CreateConnection();
-
-        if (definition.Type.Equals("Function", StringComparison.OrdinalIgnoreCase))
-        {
-            var result = await connection.ExecuteScalarAsync<decimal?>("SELECT dbo.fn_TinhCongNo(@MaHoaDon)", new { MaHoaDon = "HD003" });
-            return $"fn_TinhCongNo trả về {result:N0}.";
-        }
-
-        await connection.ExecuteAsync(
-            definition.ExecuteName,
-            BuildDemoParameters(definition.Id),
-            commandType: System.Data.CommandType.StoredProcedure);
-
-        return $"Đã gọi {definition.ExecuteName} bằng Dapper.";
-    }
-
-    private static object BuildDemoParameters(string scenarioId)
-    {
-        return scenarioId switch
-        {
-            "lap-hop-dong" => new { MaPhong = "P101", MaKhachThue = "KT001" },
-            "trigger-trang-thai-phong" => new { MaPhong = "P102" },
-            "trigger-tong-tien-hoa-don" => new { MaHoaDon = "HD001" },
-            "ghi-nhan-thanh-toan" => new { MaHoaDon = "HD002", SoTien = 1500000 },
-            "cursor-quet-qua-han" => new { NgayQuet = DateTime.Today },
-            _ => new { }
-        };
-    }
 }

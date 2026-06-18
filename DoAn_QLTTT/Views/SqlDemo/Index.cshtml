@@ -2,132 +2,384 @@
 @{
     ViewData["Title"] = "Demo SQL";
     var scenario = Model.SelectedScenario;
+    var selectedIndex = scenario is null ? -1 : Model.Scenarios.ToList().FindIndex(x => x.Id == scenario.Id);
 }
 
 @functions {
-    private static string FormatCell(object? value)
+    private string GetScenarioIcon(string id)
     {
-        return value switch
+        return id switch
         {
-            null => "",
-            decimal number => number.ToString("N0"),
-            double number => number.ToString("N0"),
-            float number => number.ToString("N0"),
-            int number => number.ToString("N0"),
-            long number => number.ToString("N0"),
-            DateTime date => date.ToString("dd/MM/yyyy"),
-            _ => value.ToString() ?? ""
+            "them-khach-thue" => "bi-person-plus-fill",
+            "lap-hop-dong" => "bi-file-earmark-medical-fill",
+            "ghi-chi-so" => "bi-lightning-charge-fill",
+            "lap-hoa-don-thang" => "bi-receipt",
+            "ghi-nhan-thanh-toan" => "bi-wallet2",
+            "tinh-cong-no-hop-dong" => "bi-calculator-fill",
+            "quet-hoa-don-qua-han" => "bi-bell-fill",
+            "quet-hop-dong-het-han" => "bi-shield-check-fill",
+            _ => "bi-database-fill"
         };
+    }
+
+    private string GetBadgeClass(string type)
+    {
+        if (type.Contains("Procedure") && type.Contains("Trigger") && type.Contains("Function")) return "bg-dark-subtle text-dark border-dark-subtle";
+        if (type.Contains("Procedure") && type.Contains("Trigger")) return "bg-primary-subtle text-primary border-primary-subtle";
+        if (type.Contains("Cursor")) return "bg-warning-subtle text-warning border-warning-subtle";
+        if (type.Contains("Procedure")) return "bg-success-subtle text-success border-success-subtle";
+        if (type.Contains("Function")) return "bg-info-subtle text-info border-info-subtle";
+        return "bg-light text-secondary border-secondary-subtle";
     }
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-    <div>
-        <h1 class="h4 fw-800 mb-1">Demo SQL</h1>
-        <div class="text-muted fw-600">Procedure, trigger, function và cursor theo format B1-B5</div>
+<div class="sql-demo-page container-fluid px-0">
+    <!-- Hero Banner with Cyber Tech aesthetics -->
+    <div class="sql-demo-hero mb-4 shadow-sm p-4 rounded-4 position-relative overflow-hidden">
+        <div class="position-relative z-2">
+            <span class="sql-demo-eyebrow text-uppercase fw-800 tracking-wider text-info"><i class="bi bi-cpu-fill me-1"></i>Interactive SQL Demo Hub</span>
+            <h1 class="display-6 fw-800 mt-1 mb-2 text-white">Trực quan hóa luồng nghiệp vụ quản lý phòng trọ</h1>
+            <p class="mb-0 max-w-700" style="color: rgba(241, 245, 249, 0.85) !important;">
+                Theo dõi quy trình hoạt động từ thêm khách thuê mới, lập hợp đồng, ghi chỉ số dịch vụ, phát hành hóa đơn đến thanh toán và rà soát định kỳ qua các câu lệnh SQL Server thực tế.
+            </p>
+        </div>
+        <div class="sql-demo-status d-flex flex-column align-items-end justify-content-center z-2 text-end">
+            <span class="badge @(Model.IsMock ? "bg-warning text-dark border-warning" : "bg-success text-white border-success") px-3 py-2 rounded-3 fs-7 mb-1 d-inline-flex align-items-center gap-2 shadow-sm">
+                <span class="spinner-grow spinner-grow-sm" role="status" style="width: 8px; height: 8px;"></span>
+                @(Model.IsMock ? "Đang chạy dữ liệu Mock" : "Kết nối SQL Server thật")
+            </span>
+            <span class="small" style="color: rgba(241, 245, 249, 0.8) !important;">Trạng thái Database</span>
+        </div>
+        <div class="hero-bg-decoration"></div>
     </div>
-    <span class="badge @(Model.IsMock ? "bg-warning text-dark" : "bg-primary")">
-        Nguồn dữ liệu: @(Model.IsMock ? "Mock Data" : "SQL Server")
-    </span>
-</div>
 
-@if (Model.IsMock)
-{
-    <div class="alert alert-warning" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        Chế độ Mock Data chỉ dùng để dựng giao diện. Khi nộp/demo chính thức cần chuyển DataProvider sang SqlServer và kết nối SQL Server thật.
-    </div>
-}
-
-<div class="row g-4">
-    <div class="col-xl-3">
-        <div class="table-card">
-            <div class="p-3 border-bottom bg-white">
-                <h2 class="h6 mb-0 fw-800 text-uppercase">Kịch bản demo</h2>
+    @if (Model.IsMock)
+    {
+        <div class="alert alert-warning border-0 shadow-sm rounded-3 d-flex align-items-center gap-3 p-3 mb-4" role="alert">
+            <div class="bg-warning bg-opacity-25 text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
             </div>
-            <div class="list-group list-group-flush">
-                @foreach (var item in Model.Scenarios)
-                {
-                    <a class="list-group-item list-group-item-action @(scenario?.Id == item.Id ? "active" : "")"
-                       asp-controller="SqlDemo"
-                       asp-action="Index"
-                       asp-route-id="@item.Id">
-                        <div class="fw-700">@item.Title</div>
-                        <small>@item.Type</small>
-                    </a>
-                }
+            <div>
+                <strong>Chế độ Mock Data đang hoạt động:</strong> Thao tác sẽ được giả lập cục bộ để chạy thử nghiệm nhanh. 
+                Khi chuyển sang Database thật (SQL Server) trong file cấu hình, hệ thống sẽ gọi trực tiếp các Stored Procedure, Trigger và Function trên máy chủ.
             </div>
         </div>
-    </div>
+    }
 
-    <div class="col-xl-9">
-        @if (scenario is not null)
-        {
-            <div class="table-card mb-4">
-                <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center gap-2">
+    <div class="row g-4">
+        <!-- Sidebar: Roadmap Stepper -->
+        <div class="col-12 col-xl-3">
+            <div class="sql-demo-panel sql-demo-sticky shadow-sm rounded-4 p-3 border">
+                <div class="sql-demo-panel-header pb-3 mb-3 border-bottom d-flex align-items-center justify-content-between">
                     <div>
-                        <h2 class="h6 mb-1 fw-800">@scenario.Title</h2>
-                        <span class="badge bg-light text-dark">@scenario.Type</span>
-                        @if (Model.IsMock)
-                        {
-                            <span class="badge bg-warning text-dark ms-1">Đang chạy bằng Mock Data - sẽ thay bằng SQL Server khi có database thật</span>
-                        }
+                        <span class="sql-demo-eyebrow text-primary">Kịch bản</span>
+                        <h2 class="h5 fw-800 text-dark mb-0">8 Bước Nghiệp Vụ</h2>
+                    </div>
+                    <span class="badge bg-light text-primary border rounded-pill px-2.5 py-1 fw-700">SQL Server</span>
+                </div>
+                <div class="sql-demo-flow position-relative">
+                    @for (var index = 0; index < Model.Scenarios.Count; index++)
+                    {
+                        var item = Model.Scenarios[index];
+                        var active = scenario?.Id == item.Id;
+                        var completed = index < selectedIndex;
+                        <a class="sql-demo-flow-item d-flex align-items-center gap-3 p-2.5 rounded-3 mb-2 transition-all text-decoration-none @(active ? "active shadow-sm" : "") @(completed ? "completed" : "")"
+                           asp-controller="SqlDemo"
+                           asp-action="Index"
+                           asp-route-id="@item.Id">
+                            <div class="sql-demo-step-icon-wrap d-flex align-items-center justify-content-center rounded-circle flex-shrink-0">
+                                @if (completed)
+                                {
+                                    <i class="bi bi-check-lg"></i>
+                                }
+                                else
+                                {
+                                    <span class="step-num">@(index + 1)</span>
+                                }
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <strong class="d-block text-truncate">@item.Title</strong>
+                                <span class="badge text-xxs border mt-1 @GetBadgeClass(item.Type)">@item.Type</span>
+                            </div>
+                            <div class="flow-arrow text-muted opacity-50 ms-auto">
+                                <i class="bi @(active ? "bi-chevron-right text-primary opacity-100" : "bi-chevron-right")"></i>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="col-12 col-xl-9">
+            @if (scenario is not null)
+            {
+                <!-- Active Scenario Header -->
+                <div class="sql-demo-panel mb-4 shadow-sm rounded-4 p-4 border bg-white">
+                    <div class="sql-demo-scenario-head d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="scenario-icon-box bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center rounded-3" style="width: 54px; height: 54px;">
+                                <i class="bi @GetScenarioIcon(scenario.Id) fs-3"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="badge bg-primary px-2 py-1 fs-8 text-uppercase">Bước @(selectedIndex + 1)</span>
+                                    <span class="badge border @GetBadgeClass(scenario.Type) px-2 py-1 fs-8">@scenario.Type</span>
+                                </div>
+                                <h2 class="h3 fw-800 text-dark mt-1 mb-0">@scenario.Title</h2>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (scenario.HasExecuted)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-3 fw-700 fs-7">
+                                    <i class="bi bi-check2-all me-1"></i>Đã thực thi thành công
+                                </span>
+                            }
+                            <button class="btn btn-primary btn-lg shadow-sm px-4 py-2.5 rounded-3 d-flex align-items-center gap-2 fw-700" type="submit" form="sql-demo-execute-form">
+                                <i class="bi bi-play-circle-fill fs-5"></i>
+                                Chạy câu lệnh (Ctrl+Enter)
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="p-3">
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B1: Trình bày bài toán</div>
-                        <p class="mb-0 fw-600">@scenario.Problem</p>
-                        <div class="text-muted mt-2">@scenario.Note</div>
+
+                <!-- Step Cards Grid -->
+                <div class="sql-demo-grid">
+                    <!-- B1: Problem Scenario -->
+                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
+                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
+                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B1</div>
+                            <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-chat-left-quote-fill text-muted me-1"></i>Yêu cầu nghiệp vụ & Bài toán đặt ra</h3>
+                        </div>
+                        <div class="p-3 bg-light rounded-3 border-start border-primary border-3 mb-3">
+                            <p class="fw-700 text-dark mb-0 fs-6 leading-relaxed">@scenario.Problem</p>
+                        </div>
+                        <div class="text-secondary small d-flex align-items-start gap-2">
+                            <i class="bi bi-info-circle-fill text-primary mt-0.5"></i>
+                            <span><strong>Chú thích giải pháp SQL:</strong> @scenario.Note</span>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B2: Trình bày câu truy vấn SQL</div>
-                        <pre class="bg-dark text-light rounded-2 p-3 mb-0" style="white-space: pre-wrap;"><code>@scenario.SqlScript</code></pre>
+                    <!-- B2: Interactive Code Editor -->
+                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
+                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B2</div>
+                                <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-code-slash text-muted me-1"></i>Câu truy vấn SQL có thể chỉnh sửa</h3>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" id="btn-reset-sql" title="Khôi phục câu lệnh mặc định">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" id="btn-copy-sql" title="Sao chép câu lệnh">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- IDE Window UI Mock -->
+                        <div class="sql-editor-container rounded-3 overflow-hidden shadow">
+                            <div class="sql-editor-header d-flex align-items-center justify-content-between px-3 py-2 bg-dark">
+                                <div class="mac-controls d-flex align-items-center gap-1.5">
+                                    <span class="control-dot close"></span>
+                                    <span class="control-dot minimize"></span>
+                                    <span class="control-dot maximize"></span>
+                                </div>
+                                <div class="editor-tab-indicator font-monospace small" style="color: rgba(255, 255, 255, 0.8) !important;">
+                                    <i class="bi bi-filetype-sql text-warning me-1"></i>@scenario.Id.Replace("-", "_")_script.sql
+                                </div>
+                                <div class="small" style="color: rgba(255, 255, 255, 0.6) !important;">MS SQL Server</div>
+                            </div>
+                            <textarea class="sql-demo-code sql-demo-editor font-monospace"
+                                      id="sqlScriptTextarea"
+                                      name="sqlScript"
+                                      form="sql-demo-execute-form"
+                                      spellcheck="false"
+                                      data-original-sql="@scenario.SqlScript">@scenario.SqlScript</textarea>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B3: Trình bày bảng dữ liệu liên quan trước khi chạy</div>
-                        @await Html.PartialAsync("_SqlDemoTables", scenario.BeforeTables)
+                    <!-- B3: Before State Data -->
+                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
+                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
+                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B3</div>
+                            <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-table text-muted me-1"></i>Dữ liệu hiện trạng (Trước khi chạy)</h3>
+                        </div>
+                        <div class="sql-table-wrapper">
+                            @await Html.PartialAsync("_SqlDemoTables", scenario.BeforeTables)
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <div class="stat-label mb-2">B4: Nút thực thi</div>
-                        <form asp-controller="SqlDemo" asp-action="Execute" method="post">
-                            <input type="hidden" name="id" value="@scenario.Id" />
-                            <button class="btn btn-primary" type="submit">
-                                <i class="bi bi-play-fill me-1"></i>Thực thi
-                            </button>
-                        </form>
+                    <!-- B4: Live Execute Call-To-Action -->
+                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white bg-opacity-50">
+                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
+                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B4</div>
+                            <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-play-fill text-muted me-1"></i>Phát lệnh thực thi</h3>
+                        </div>
+                        <div class="sql-demo-execute-box p-4 rounded-3 d-flex align-items-center justify-content-between gap-4 flex-wrap bg-light border">
+                            <div class="flex-grow-1">
+                                <h4 class="h6 fw-800 text-dark mb-1">Chạy thử nghiệm script SQL trên cơ sở dữ liệu</h4>
+                                <p class="mb-0 text-secondary small">
+                                    Bạn có thể thay đổi các tham số, tên khách thuê, mã phòng, hoặc số tiền trực tiếp tại khung soạn thảo (B2) rồi nhấn nút bên cạnh. Hệ thống sẽ lưu giữ dữ liệu và hiển thị kết quả thay đổi.
+                                </p>
+                            </div>
+                            <form id="sql-demo-execute-form" asp-controller="SqlDemo" asp-action="Execute" method="post" class="m-0">
+                                <input type="hidden" name="id" value="@scenario.Id" />
+                                <button class="btn btn-primary btn-lg shadow-sm px-4 py-2.5 rounded-3 d-flex align-items-center gap-2 fw-700" type="submit">
+                                    <i class="bi bi-play-fill fs-5"></i>Thực thi ngay
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                    <div>
-                        <div class="stat-label mb-2">B5: Trình bày bảng dữ liệu sau khi chạy hoặc output</div>
+                    <!-- B5: After State Data & Logs -->
+                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
+                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
+                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B5</div>
+                            <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-terminal-fill text-muted me-1"></i>Trạng thái kết quả & Dữ liệu đầu ra (Sau khi chạy)</h3>
+                        </div>
+
                         @if (!string.IsNullOrWhiteSpace(scenario.ErrorMessage))
                         {
-                            <div class="alert alert-danger mb-0">@scenario.ErrorMessage</div>
+                            <div class="sql-demo-result sql-demo-result-error shadow-sm">
+                                <div class="sql-demo-result-icon">
+                                    <i class="bi bi-x-circle-fill fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h4 class="sql-demo-result-title text-danger fw-800 fs-6 mb-1">Thực thi thất bại</h4>
+                                    <div class="sql-demo-result-message font-monospace text-danger small bg-white p-3 rounded border border-danger border-opacity-20 mt-2">
+                                        @scenario.ErrorMessage
+                                    </div>
+                                </div>
+                            </div>
                         }
                         else if (!scenario.HasExecuted)
                         {
-                            <div class="alert alert-info mb-0">Bấm Thực thi để xem dữ liệu sau khi chạy.</div>
+                            <div class="sql-demo-result sql-demo-result-idle p-4 text-center rounded-3 border-dashed mb-4 d-flex flex-column align-items-center justify-content-center py-5">
+                                <div class="sql-demo-result-icon bg-light text-primary rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 58px; height: 58px;">
+                                    <i class="bi bi-play-circle-fill fs-2"></i>
+                                </div>
+                                <h4 class="h6 fw-800 text-dark mb-1">Hệ thống đang chờ lệnh</h4>
+                                <p class="text-secondary small mb-0 max-w-450">Hãy click nút <strong>Thực thi ngay</strong> ở Bước 4 hoặc nhấn tổ hợp phím <strong>Ctrl + Enter</strong> để gửi script lên Server.</p>
+                            </div>
                         }
                         else
                         {
                             @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle) || !string.IsNullOrWhiteSpace(scenario.OutputMessage))
                             {
-                                <div class="alert alert-success">
-                                    @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle))
-                                    {
-                                        <div class="fw-800">@scenario.OutputTitle</div>
-                                    }
-                                    @scenario.OutputMessage
+                                <div class="sql-demo-result sql-demo-result-success shadow-sm">
+                                    <div class="sql-demo-result-icon">
+                                        <i class="bi bi-check-circle-fill fs-4"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h4 class="sql-demo-result-title text-success fw-800 fs-6 mb-1">
+                                            @(string.IsNullOrWhiteSpace(scenario.OutputTitle) ? "Thực thi thành công" : scenario.OutputTitle)
+                                        </h4>
+                                        @if (!string.IsNullOrWhiteSpace(scenario.OutputMessage))
+                                        {
+                                            <div class="sql-demo-result-message text-secondary small mt-1">@scenario.OutputMessage</div>
+                                        }
+                                    </div>
                                 </div>
                             }
-                            @await Html.PartialAsync("_SqlDemoTables", scenario.AfterTables)
+                            <div class="sql-demo-result-data-title mt-2 mb-3 fw-800 text-uppercase tracking-wider small text-secondary d-flex align-items-center gap-1.5 border-bottom pb-2">
+                                <i class="bi bi-database-check text-success fs-5"></i> Dữ liệu sau biến động (Sau khi chạy)
+                            </div>
+                            <div class="sql-table-wrapper">
+                                @await Html.PartialAsync("_SqlDemoTables", scenario.AfterTables)
+                            </div>
                         }
                     </div>
                 </div>
-            </div>
-        }
+            }
+            else
+            {
+                <div class="sql-demo-panel shadow-sm rounded-4 p-5 text-center bg-white border">
+                    <i class="bi bi-database-fill-gear text-primary opacity-25 display-1 mb-4"></i>
+                    <h3 class="h4 fw-800 text-dark">Hãy chọn một kịch bản</h3>
+                    <p class="text-secondary mb-0">Chọn một trong các bước nghiệp vụ ở sidebar bên trái để xem chi tiết luồng dữ liệu.</p>
+                </div>
+            }
+        </div>
     </div>
 </div>
+
+<!-- Floating Copy Success Toast (HTML-only template, controlled by JS) -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+    <div id="copyToast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="bi bi-clipboard2-check-fill text-success fs-5"></i>
+                <span>Sao chép mã script SQL thành công!</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            var textarea = document.getElementById("sqlScriptTextarea");
+            
+            // Set up Copy Button
+            $("#btn-copy-sql").click(function() {
+                if (textarea) {
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999); // For mobile devices
+                    
+                    try {
+                        navigator.clipboard.writeText(textarea.value).then(function() {
+                            showToast();
+                        }, function() {
+                            // Fallback
+                            document.execCommand("copy");
+                            showToast();
+                        });
+                    } catch (err) {
+                        document.execCommand("copy");
+                        showToast();
+                    }
+                }
+            });
+
+            // Set up Reset Button
+            $("#btn-reset-sql").click(function() {
+                if (textarea) {
+                    var original = $(textarea).data("original-sql");
+                    if (original) {
+                        textarea.value = original;
+                        
+                        // Flash text area
+                        $(textarea).addClass("border-primary");
+                        setTimeout(function() {
+                            $(textarea).removeClass("border-primary");
+                        }, 500);
+                    }
+                }
+            });
+
+            // Support running with Ctrl + Enter
+            if (textarea) {
+                $(textarea).keydown(function(e) {
+                    if (e.ctrlKey && e.keyCode === 13) {
+                        e.preventDefault();
+                        $("#sql-demo-execute-form").submit();
+                    }
+                });
+            }
+
+            function showToast() {
+                var toastEl = document.getElementById('copyToast');
+                if (toastEl && typeof bootstrap !== 'undefined') {
+                    var toast = new bootstrap.Toast(toastEl, { delay: 2500 });
+                    toast.show();
+                } else {
+                    alert("Đã sao chép câu lệnh SQL!");
+                }
+            }
+        });
+    </script>
+}
+

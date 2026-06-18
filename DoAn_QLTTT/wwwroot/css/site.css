@@ -10,6 +10,7 @@
     --tech-border-focus: rgba(37, 99, 235, 0.4);
     
     /* Brand Accent Colors - UIT Themed */
+    --primary: #3b82f6;
     --uit-blue-dark: #001f3d;
     --uit-navy: #002d5a;
     --uit-blue: #004d80;
@@ -373,18 +374,23 @@ body {
 
 /* Stat Cards */
 .stat-card {
-    background: var(--tech-card);
-    border: 1px solid var(--tech-border);
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
     border-radius: var(--radius-md);
-    box-shadow: var(--glass-shadow);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 90px; /* Reduced from 120px */
-    padding: 16px;
+    min-height: 110px;
+    padding: 20px;
     position: relative;
     transition: var(--transition);
     overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card::before {
@@ -392,25 +398,74 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 3px;
+    width: 4px;
     height: 100%;
-    background: var(--uit-blue-light);
+    background: var(--primary);
+    transition: var(--transition);
 }
+
+/* Stat Card Color Accents */
+.stat-card.primary::before { background: var(--primary); }
+.stat-card.success::before { background: var(--neon-green); }
+.stat-card.warning::before { background: var(--neon-yellow); }
+.stat-card.danger::before { background: var(--neon-red); }
+.stat-card.info::before { background: var(--neon-cyan); }
+
+/* Hover glow line effect */
+.stat-card.primary:hover::before { box-shadow: 0 0 12px var(--primary); }
+.stat-card.success:hover::before { box-shadow: 0 0 12px var(--neon-green); }
+.stat-card.warning:hover::before { box-shadow: 0 0 12px var(--neon-yellow); }
+.stat-card.danger:hover::before { box-shadow: 0 0 12px var(--neon-red); }
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: 0.72rem;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
-    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
 }
 
 .stat-value {
-    color: var(--uit-navy);
-    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.6rem;
     font-weight: 800;
     line-height: 1;
+}
+
+.stat-icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Banner Circle Decorations */
+.welcome-banner-circle-decoration-1 {
+    position: absolute;
+    top: -40px;
+    right: 20%;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.welcome-banner-circle-decoration-2 {
+    position: absolute;
+    bottom: -60px;
+    right: 10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
 /* Table Card */
@@ -513,3 +568,401 @@ body {
         flex: 1 1 auto;
     }
 }
+
+/* SQL Demo Dashboard Styles */
+.sql-demo-page {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Premium Dark-Glow Hero Section */
+.sql-demo-hero {
+    background: linear-gradient(135deg, var(--uit-blue-dark) 0%, var(--uit-navy) 50%, var(--uit-blue) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 40px -15px rgba(0, 31, 61, 0.3);
+    position: relative;
+    padding: 32px !important;
+}
+
+.sql-demo-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-bg-decoration {
+    position: absolute;
+    right: -20px;
+    bottom: -40px;
+    font-size: 240px;
+    opacity: 0.06;
+    color: #ffffff;
+    pointer-events: none;
+    transform: rotate(-10deg);
+    font-family: "bootstrap-icons";
+}
+.hero-bg-decoration::after {
+    content: "\F2DC"; /* bi-database-fill */
+}
+
+.sql-demo-hero h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sql-demo-hero p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* Panel Containers */
+.sql-demo-panel {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.sql-demo-sticky {
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+/* Sidebar Stepper Roadmap Layout */
+.sql-demo-flow {
+    padding-left: 8px;
+}
+
+/* Connective line helper */
+.sql-demo-flow::before {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: rgba(15, 23, 42, 0.06);
+    z-index: 1;
+}
+
+.sql-demo-flow-item {
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sql-demo-flow-item strong {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.sql-demo-flow-item:hover {
+    background: rgba(59, 130, 246, 0.04);
+    transform: translateX(4px);
+}
+
+/* Roadmap step bullet styling */
+.sql-demo-step-icon-wrap {
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border: 2px solid rgba(15, 23, 42, 0.1);
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.8rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.sql-demo-flow-item.active {
+    background: rgba(59, 130, 246, 0.08) !important;
+    border-color: rgba(37, 99, 235, 0.15);
+}
+
+.sql-demo-flow-item.active .sql-demo-step-icon-wrap {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    transform: scale(1.1);
+}
+
+.sql-demo-flow-item.active strong {
+    color: var(--primary);
+}
+
+/* Completed Steps style */
+.sql-demo-flow-item.completed .sql-demo-step-icon-wrap {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+}
+
+/* Sub-headings and layout */
+.text-xxs {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.scenario-icon-box {
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.1);
+}
+
+/* Step Card Styles */
+.sql-demo-grid {
+    display: grid;
+    gap: 24px;
+}
+
+.sql-demo-step-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sql-demo-step-card:hover {
+    box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.04);
+}
+
+/* Indicator strip on cards */
+.sql-demo-step-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.sql-demo-step-card:hover::before {
+    background: var(--primary);
+}
+
+.step-badge-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* macOS Terminal / IDE Styling */
+.sql-editor-container {
+    border: 1px solid #2d3748;
+    background: #0d1117;
+}
+
+.sql-editor-header {
+    background: #161b22 !important;
+    border-bottom: 1px solid #21262d;
+    height: 38px;
+}
+
+.mac-controls {
+    display: flex;
+    align-items: center;
+}
+
+.control-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.control-dot.close { background: #ff5f56; }
+.control-dot.minimize { background: #ffbd2e; }
+.control-dot.maximize { background: #27c93f; }
+
+.sql-demo-code.sql-demo-editor {
+    width: 100%;
+    min-height: 280px;
+    max-height: 500px;
+    padding: 20px;
+    background: #0d1117;
+    color: #c9d1d9;
+    border: none;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    white-space: pre-wrap;
+    box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.sql-demo-code.sql-demo-editor:focus {
+    box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Code area highlight transitions */
+.sql-demo-editor.border-primary {
+    border: 1px solid var(--primary) !important;
+}
+
+/* Table Card Blocks inside SQL view */
+.sql-demo-table-block {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.sql-demo-table-title {
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.sql-demo-table-icon-wrap {
+    color: var(--primary);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Custom Table Design inside SQL Demo */
+.sql-demo-table {
+    font-size: 0.8rem;
+    margin-bottom: 0;
+}
+
+.sql-demo-table thead th {
+    background: #001f3d;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 10px 14px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.sql-demo-table tbody td {
+    padding: 10px 14px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    font-weight: 500;
+}
+
+.sql-demo-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sql-demo-table tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.03) !important;
+}
+
+/* Live execution card custom elements */
+.sql-demo-execute-box {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+/* Results panel elements */
+.sql-demo-result {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    transition: var(--transition);
+}
+
+.sql-demo-result-success {
+    background-color: rgba(16, 185, 129, 0.04);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.sql-demo-result-success .sql-demo-result-icon {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.sql-demo-result-error {
+    background-color: rgba(239, 68, 68, 0.04);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.sql-demo-result-error .sql-demo-result-icon {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+
+.sql-demo-result-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sql-demo-result-idle {
+    border: 2px dashed rgba(15, 23, 42, 0.08);
+    background: rgba(15, 23, 42, 0.01);
+}
+
+.max-w-450 { max-width: 450px; }
+.max-w-700 { max-width: 700px; }
+.tracking-wider { letter-spacing: 0.06em; }
+.fs-7 { font-size: 0.85rem !important; }
+.fs-8 { font-size: 0.72rem !important; }
+.fs-9 { font-size: 0.65rem !important; }
+.text-xxs { font-size: 0.65rem !important; }
+.px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+
+/* Responsive Adjustments */
+@media (max-width: 1199.98px) {
+    .sql-demo-sticky {
+        position: static;
+        max-height: none;
+        margin-bottom: 24px;
+    }
+    
+    .sql-demo-flow::before {
+        display: none;
+    }
+}
+

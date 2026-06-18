@@ -18,7 +18,7 @@
         <div class="sidebar-brand">
             <img class="brand-logo-img" src="https://upload.wikimedia.org/wikipedia/commons/0/00/Logo_UIT_updated.svg" alt="UIT Logo" />
             <div>
-                <div class="brand-title">Quản lý phòng trọ</div>
+                <div class="brand-title">Quản lý thuê phòng trọ</div>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             <a class="@Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">
                 <i class="bi bi-grid-1x2-fill"></i><span>Tổng quan</span>
             </a>
-            <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Quản lý phòng</div>
+            @* <div class="nav-section-title mt-3 mb-1 ms-3" style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Quản lý phòng</div>
             <a class="@Active("LoaiPhong")" asp-controller="LoaiPhong" asp-action="Index">
                 <i class="bi bi-collection-fill"></i><span>Loại phòng</span>
             </a>
@@ -59,7 +59,7 @@
             </a>
             <a class="@Active("NguoiDung")" asp-controller="NguoiDung" asp-action="Index">
                 <i class="bi bi-shield-lock-fill"></i><span>Bảo mật</span>
-            </a>
+            </a> *@
             <a class="@Active("SqlDemo")" asp-controller="SqlDemo" asp-action="Index">
                 <i class="bi bi-database-gear"></i><span>Demo SQL</span>
             </a>
@@ -71,7 +71,7 @@
             <div class="container-fluid">
                 <div class="d-none d-lg-block">
                     <div class="topbar-title">@ViewData["Title"]</div>
-                    <div class="topbar-subtitle">Hệ thống Quản lý phòng trọ</div>
+                    <div class="topbar-subtitle">Hệ thống Quản lý thuê phòng trọ</div>
                 </div>
                 <div class="ms-auto d-flex align-items-center gap-3">
                     <div class="topbar-icon-btn d-none d-md-flex" style="background: rgba(15, 23, 42, 0.04); width: 40px; height: 40px; border-radius: 10px; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer;">

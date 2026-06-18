@@ -1,67 +1,211 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Tổng quan";
+    ViewData["Title"] = "Tổng quan nhà trọ";
 }
 
-@* <div class="welcome-banner mb-4 p-4 rounded-4" style="background: linear-gradient(135deg, #001f3d 0%, #004d80 100%); color: white; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 31, 61, 0.2);">
-    <div style="position: relative; z-index: 2;">
-        <h1 class="display-6 fw-800 mb-1" style="letter-spacing: -1px;">Chào mừng trở lại, @ViewBag.CurrentUserName! 👋</h1>
-        <p class="opacity-75 mb-0">Hôm nay là @DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN")). Chúc bạn một ngày làm việc hiệu quả.</p>
+<!-- Premium Modern Welcome Banner with Quick CTAs -->
+<div class="welcome-banner mb-4 p-4 rounded-4 position-relative overflow-hidden shadow" style="background: linear-gradient(135deg, var(--uit-blue-dark) 0%, var(--uit-navy) 60%, var(--uit-blue) 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+    <div class="position-relative z-2 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                <span class="badge bg-white bg-opacity-10 text-info border border-info border-opacity-25 px-2.5 py-1 text-uppercase fw-800 tracking-wider small">
+                    <i class="bi bi-shield-check me-1"></i>Hệ thống vận hành
+                </span>
+                <span class="badge bg-info bg-opacity-15 text-white border border-info border-opacity-20 px-2.5 py-1 text-uppercase fw-800 tracking-wider small">
+                    <i class="bi bi-database-fill me-1"></i>SQL Server
+                </span>
+            </div>
+            <h1 class="display-6 fw-800 mb-1 text-white" style="letter-spacing: -1px;">Tổng quan nhà trọ</h1>
+            <p class="mb-0 d-flex align-items-center gap-2 small" style="color: rgba(241, 245, 249, 0.85) !important;">
+                <i class="bi bi-info-circle-fill text-info"></i> Tình hình phòng, doanh thu và công nợ trong hệ thống. Hôm nay là @DateTime.Now.ToString("dddd, dd MMMM yyyy", new System.Globalization.CultureInfo("vi-VN")).
+            </p>
+        </div>
+        <!-- Quick Action Buttons -->
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="HoaDon" asp-action="Create" class="btn btn-info text-dark d-flex align-items-center gap-1.5 fw-700 px-3 py-2 rounded-3 shadow-sm transition-all text-decoration-none">
+                <i class="bi bi-receipt"></i> Lập hóa đơn
+            </a>
+            <a asp-controller="ThanhToan" asp-action="Create" class="btn btn-light d-flex align-items-center gap-1.5 fw-700 px-3 py-2 rounded-3 shadow-sm transition-all text-decoration-none">
+                <i class="bi bi-wallet2"></i> Ghi thanh toán
+            </a>
+            <a asp-controller="NhacNo" asp-action="Index" class="btn btn-outline-light d-flex align-items-center gap-1.5 fw-700 px-3 py-2 rounded-3 transition-all text-decoration-none">
+                <i class="bi bi-bell"></i> Nhắc nợ
+            </a>
+        </div>
     </div>
-    <div style="position: absolute; right: -50px; bottom: -50px; font-size: 200px; opacity: 0.1; color: white; pointer-events: none;">
-        <i class="bi bi-buildings"></i>
+    <div style="position: absolute; right: -30px; bottom: -30px; font-size: 180px; opacity: 0.05; color: white; pointer-events: none; transform: rotate(-15deg);">
+        <i class="bi bi-buildings-fill"></i>
     </div>
-</div> *@
+    <div class="welcome-banner-circle-decoration-1"></div>
+    <div class="welcome-banner-circle-decoration-2"></div>
+</div>
 
+<!-- Prominent Pending Task Warnings -->
+@if (Model.HoaDonQuaHan > 0 || Model.TongCongNo > 0)
+{
+    <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-start gap-3 p-3.5 mb-4" role="alert" style="background-color: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.15) !important;">
+        <div class="bg-danger bg-opacity-15 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h4 class="alert-heading h6 fw-800 text-danger mb-1">Cảnh báo công nợ cần xử lý</h4>
+            <div class="text-secondary small leading-relaxed">
+                @if (Model.HoaDonQuaHan > 0)
+                {
+                    <span class="d-block mb-1"><i class="bi bi-calendar-x text-danger me-1"></i> Có <strong>@Model.HoaDonQuaHan</strong> hóa đơn đã quá hạn thanh toán chưa được giải quyết.</span>
+                }
+                @if (Model.TongCongNo > 0)
+                {
+                    <span class="d-block"><i class="bi bi-cash-stack text-danger me-1"></i> Tổng số tiền khách hàng còn nợ là <strong>@FormatHelper.Money(Model.TongCongNo)</strong>.</span>
+                }
+            </div>
+            <div class="mt-2.5 d-flex gap-2">
+                <a asp-controller="NhacNo" asp-action="Index" class="btn btn-sm btn-danger fw-700 rounded-2">
+                    <i class="bi bi-send-fill me-1"></i> Gửi thông báo nhắc nợ
+                </a>
+                <a asp-controller="HoaDon" asp-action="Index" class="btn btn-sm btn-outline-danger fw-700 rounded-2">
+                    <i class="bi bi-receipt-cutoff me-1"></i> Xem danh sách hóa đơn
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- 8 KPI Cards Grid -->
 <div class="row g-4 mb-4">
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
+    <!-- Row 1: Rooms KPIs -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card primary">
             <div class="d-flex justify-content-between align-items-start">
-                <div>
+                <div class="flex-grow-1">
                     <div class="stat-label">Tổng số phòng</div>
-                    <div class="stat-value">@Model.TongSoPhong</div>
+                    <div class="stat-value text-primary mt-1">@Model.TongSoPhong</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-house-door me-1 text-primary"></i>Khu trọ đang quản lý
+                    </div>
                 </div>
-                <div style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--uit-blue-light); font-size: 1.5rem;">
-                    <i class="bi bi-door-closed"></i>
+                <div class="stat-icon-wrap bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-house-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card" style="border-left-color: var(--neon-green);">
+    
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
             <div class="d-flex justify-content-between align-items-start">
-                <div>
+                <div class="flex-grow-1">
                     <div class="stat-label">Phòng trống</div>
-                    <div class="stat-value text-success">@Model.PhongTrong</div>
+                    <div class="stat-value text-success mt-1">@Model.PhongTrong</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-check2-circle me-1 text-success"></i>Có thể lập hợp đồng ngay
+                    </div>
                 </div>
-                <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--neon-green); font-size: 1.5rem;">
-                    <i class="bi bi-door-open"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card" style="border-left-color: var(--uit-blue-light);">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-label">Đang thuê</div>
-                    <div class="stat-value text-primary">@Model.PhongDangThue</div>
-                </div>
-                <div style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--uit-blue-light); font-size: 1.5rem;">
-                    <i class="bi bi-people"></i>
+                <div class="stat-icon-wrap bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-door-open-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="stat-card" style="border-left-color: var(--neon-red);">
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card info">
             <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-label">Hóa đơn nợ</div>
-                    <div class="stat-value text-danger">@Model.HoaDonChuaThanhToan</div>
+                <div class="flex-grow-1">
+                    <div class="stat-label">Phòng đang thuê</div>
+                    <div class="stat-value text-info mt-1">@Model.PhongDangThue</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-people me-1 text-info"></i>Đang ở ổn định
+                    </div>
                 </div>
-                <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--neon-red); font-size: 1.5rem;">
-                    <i class="bi bi-exclamation-circle"></i>
+                <div class="stat-icon-wrap bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="stat-label">Phòng bảo trì</div>
+                    <div class="stat-value text-warning mt-1">@Model.PhongBaoTri</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-tools me-1 text-warning"></i>Đang sửa chữa nâng cấp
+                    </div>
+                </div>
+                <div class="stat-icon-wrap bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-wrench-adjustable-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Financial KPIs -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="stat-label">Doanh thu tháng này</div>
+                    <div class="stat-value text-success mt-1">@FormatHelper.Money(Model.DoanhThuThang)</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-cash-stack me-1 text-success"></i>Đã ghi nhận trong kỳ
+                    </div>
+                </div>
+                <div class="stat-icon-wrap bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="stat-label">Tổng công nợ chưa thu</div>
+                    <div class="stat-value text-warning mt-1">@FormatHelper.Money(Model.TongCongNo)</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-exclamation-triangle me-1 text-warning"></i>Tiền phòng & dịch vụ nợ dồn
+                    </div>
+                </div>
+                <div class="stat-icon-wrap bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="stat-label">Hóa đơn nợ chưa trả</div>
+                    <div class="stat-value text-danger mt-1">@Model.HoaDonChuaThanhToan</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-receipt me-1 text-danger"></i>Hóa đơn còn nợ một phần/toàn bộ
+                    </div>
+                </div>
+                <div class="stat-icon-wrap bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-file-earmark-diff-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger animate-pulse">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <div class="stat-label">Hóa đơn quá hạn</div>
+                    <div class="stat-value text-danger mt-1">@Model.HoaDonQuaHan</div>
+                    <div class="mt-2 text-secondary fs-8 fw-600">
+                        <i class="bi bi-calendar-x me-1 text-danger"></i>Hóa đơn đã trễ hạn thanh toán
+                    </div>
+                </div>
+                <div class="stat-icon-wrap bg-danger bg-opacity-10 text-danger" style="animation: pulse 2s infinite;">
+                    <i class="bi bi-exclamation-octagon-fill"></i>
                 </div>
             </div>
         </div>
@@ -69,24 +213,35 @@
 </div>
 
 <div class="row g-4 mb-4">
+    <!-- Chart 1: Revenue Trends -->
     <div class="col-xl-8">
-        <div class="table-card p-4">
+        <div class="table-card p-4 border bg-white shadow-sm rounded-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h5 fw-800 mb-0"><i class="bi bi-bar-chart-line-fill me-2" style="color: var(--uit-blue-light)"></i>Xu hướng doanh thu</h2>
-                <span class="text-muted small fw-600">6 tháng gần nhất</span>
+                <div>
+                    <h2 class="h5 fw-800 text-dark mb-1"><i class="bi bi-bar-chart-line-fill me-2 text-primary"></i>Xu hướng doanh thu</h2>
+                    <p class="text-muted small mb-0 fw-600">Theo dõi doanh thu phòng trọ trong 6 tháng gần nhất</p>
+                </div>
+                <span class="badge bg-light text-secondary border fw-700 py-1.5 px-2.5">Đơn vị: VNĐ</span>
             </div>
-            <div style="position: relative; height: 350px; width: 100%;">
+            <div style="position: relative; height: 320px; width: 100%;">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
     </div>
+
+    <!-- Chart 2: Occupancy Rate Doughnut -->
     <div class="col-xl-4">
-        <div class="table-card p-4">
+        <div class="table-card p-4 border bg-white shadow-sm rounded-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h5 fw-800 mb-0"><i class="bi bi-pie-chart-fill me-2" style="color: var(--uit-orange)"></i>Trạng thái phòng</h2>
-                <span class="badge bg-light text-dark fw-700">Tỉ lệ lấp đầy: @(Model.TongSoPhong > 0 ? (Model.PhongDangThue * 100 / Model.TongSoPhong) : 0)%</span>
+                <div>
+                    <h2 class="h5 fw-800 text-dark mb-1"><i class="bi bi-pie-chart-fill me-2 text-warning"></i>Trạng thái phòng</h2>
+                    <p class="text-muted small mb-0 fw-600">Tỷ lệ lấp đầy thực tế</p>
+                </div>
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 fw-700 py-1.5 px-2.5">
+                    Lấp đầy: @(Model.TongSoPhong > 0 ? (Model.PhongDangThue * 100 / Model.TongSoPhong) : 0)%
+                </span>
             </div>
-            <div style="position: relative; height: 350px; width: 100%;">
+            <div style="position: relative; height: 320px; width: 100%;">
                 <canvas id="occupancyChart"></canvas>
             </div>
         </div>
@@ -94,65 +249,124 @@
 </div>
 
 <div class="row g-4">
+    <!-- Recent Bills Table -->
     <div class="col-xl-8">
-        <div class="table-card">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
-                <h2 class="h6 mb-0 fw-800 text-uppercase letter-spacing-05"><i class="bi bi-clock-history me-2 text-primary"></i>Hóa đơn gần đây</h2>
-                <a class="btn btn-sm btn-outline-primary" asp-controller="HoaDon" asp-action="Index">Tất cả <i class="bi bi-arrow-right ms-1"></i></a>
+        <div class="table-card shadow-sm border bg-white rounded-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                <h2 class="h6 mb-0 fw-800 text-uppercase tracking-wider text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-primary"></i>Hóa đơn gần đây
+                </h2>
+                <a class="btn btn-xs btn-outline-primary fw-700 rounded-3 px-3" asp-controller="HoaDon" asp-action="Index">
+                    Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+                </a>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 80px;">Mã</th>
-                            <th>Mô tả</th>
+                            <th style="width: 90px;">Mã HĐ</th>
+                            <th>Mô tả / Phòng</th>
                             <th>Thời gian</th>
                             <th class="text-end">Tổng tiền</th>
-                            <th class="text-center">Trạng thái</th>
+                            <th class="text-end">Đã thu</th>
+                            <th class="text-end">Còn lại</th>
+                            <th>Hạn TT</th>
+                            <th class="text-center" style="width: 140px;">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.HoaDonGanDay)
+                        @if (Model.HoaDonGanDay.Count == 0)
                         {
                             <tr>
-                                <td class="fw-700 text-primary">#@item.MaHoaDon</td>
-                                <td class="fw-600">@item.HopDongMoTa</td>
-                                <td class="text-muted small">Tháng @item.Thang/@item.Nam</td>
-                                <td class="text-end fw-700">@FormatHelper.Money(item.TongTien)</td>
-                                <td class="text-center"><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox me-1"></i>Không có hóa đơn nào gần đây.
+                                </td>
                             </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model.HoaDonGanDay)
+                            {
+                                <tr>
+                                    <td><code class="px-2 py-0.5 bg-light border rounded text-secondary font-monospace small">#@item.MaHoaDon</code></td>
+                                    <td class="fw-700 text-dark">@item.HopDongMoTa</td>
+                                    <td class="text-secondary small fw-600">Tháng @item.Thang/@item.Nam</td>
+                                    <td class="text-end fw-700 text-dark">@FormatHelper.Money(item.TongTien)</td>
+                                    <td class="text-end text-success fw-600">@FormatHelper.Money(item.DaThanhToan)</td>
+                                    <td class="text-end text-danger fw-700">@FormatHelper.Money(item.ConLai)</td>
+                                    <td class="text-secondary small"><i class="bi bi-calendar3 text-muted me-1"></i>@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-center">
+                                        @{
+                                            var statusClass = item.TrangThai switch
+                                            {
+                                                "DaThanhToan" => "bg-success-subtle text-success border-success-subtle",
+                                                "ChuaThanhToan" => "bg-warning-subtle text-warning border-warning-subtle",
+                                                "QuaHan" => "bg-danger-subtle text-danger border-danger-subtle",
+                                                "MotPhan" => "bg-info-subtle text-info border-info-subtle",
+                                                _ => "bg-secondary-subtle text-secondary"
+                                            };
+                                            var statusText = item.TrangThai switch
+                                            {
+                                                "DaThanhToan" => "Đã thanh toán",
+                                                "ChuaThanhToan" => "Chưa thanh toán",
+                                                "QuaHan" => "Quá hạn",
+                                                "MotPhan" => "Thanh toán 1 phần",
+                                                _ => item.TrangThai
+                                            };
+                                        }
+                                        <span class="badge border px-2.5 py-1 rounded-pill @statusClass">@statusText</span>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!-- Active Rooms List -->
     <div class="col-xl-4">
-        <div class="table-card">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
-                <h2 class="h6 mb-0 fw-800 text-uppercase letter-spacing-05"><i class="bi bi-door-closed me-2 text-primary"></i>Phòng đang thuê</h2>
-                <a class="btn btn-sm btn-outline-primary" asp-controller="PhongTro" asp-action="Index">Chi tiết</a>
+        <div class="table-card shadow-sm border bg-white rounded-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                <h2 class="h6 mb-0 fw-800 text-uppercase tracking-wider text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-house-door-fill text-success"></i>Phòng đang thuê
+                </h2>
+                <a class="btn btn-xs btn-outline-success fw-700 rounded-3 px-3" asp-controller="PhongTro" asp-action="Index">
+                    Xem tất cả
+                </a>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Phòng</th>
-                            <th class="text-end">Giá thuê</th>
+                            <th>Tên Phòng</th>
+                            <th class="text-end">Giá thuê / Tháng</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.PhongDangThueList)
+                        @if (Model.PhongDangThueList.Count == 0)
                         {
                             <tr>
-                                <td class="fw-semibold">
-                                    <div class="d-flex align-items-center">
-                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--neon-green); margin-right: 10px;"></div>
-                                        @item.SoPhong
-                                    </div>
+                                <td colspan="2" class="text-center py-4 text-muted">
+                                    <i class="bi bi-door-open me-1"></i>Chưa có phòng nào đang thuê.
                                 </td>
-                                <td class="text-end fw-700">@FormatHelper.Money(item.GiaThue)</td>
                             </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model.PhongDangThueList)
+                            {
+                                <tr>
+                                    <td class="fw-700 text-dark">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="d-inline-block rounded-circle bg-success shadow-sm" style="width: 8px; height: 8px;"></span>
+                                            @item.SoPhong
+                                        </div>
+                                    </td>
+                                    <td class="text-end fw-800 text-primary">@FormatHelper.Money(item.GiaThue)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -167,7 +381,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Helper for gradients
             function getGradient(ctx, color1, color2) {
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                const gradient = ctx.createLinearGradient(0, 0, 0, 320);
                 gradient.addColorStop(0, color1);
                 gradient.addColorStop(1, color2);
                 return gradient;
@@ -175,7 +389,7 @@
 
             // Setup Revenue Chart
             const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-            const blueGradient = getGradient(ctxRevenue, 'rgba(59, 130, 246, 0.8)', 'rgba(59, 130, 246, 0.1)');
+            const blueGradient = getGradient(ctxRevenue, 'rgba(59, 130, 246, 0.85)', 'rgba(59, 130, 246, 0.15)');
             
             new Chart(ctxRevenue, {
                 type: 'bar',
@@ -185,12 +399,12 @@
                         label: 'Doanh thu',
                         data: @Html.Raw(Json.Serialize(Model.MonthlyRevenueValues)),
                         backgroundColor: blueGradient,
-                        borderColor: 'var(--uit-blue-light)',
-                        borderWidth: 1.5,
-                        borderRadius: 4,
-                        hoverBackgroundColor: 'var(--uit-blue-light)',
-                        hoverBorderColor: 'var(--uit-blue-light)',
-                        barPercentage: 0.6
+                        borderColor: 'var(--primary)',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        hoverBackgroundColor: 'var(--primary)',
+                        hoverBorderColor: 'var(--primary)',
+                        barPercentage: 0.5
                     }]
                 },
                 options: {
@@ -203,13 +417,17 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1e293b',
+                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                            titleColor: '#0f172a',
+                            titleFont: { size: 12, weight: 'bold' },
                             bodyColor: '#475569',
+                            bodyFont: { size: 12, weight: '600' },
                             borderColor: 'rgba(59, 130, 246, 0.2)',
                             borderWidth: 1,
-                            padding: 10,
+                            padding: 12,
                             displayColors: false,
+                            shadowColor: 'rgba(0, 0, 0, 0.08)',
+                            shadowBlur: 10,
                             callbacks: {
                                 label: function(context) {
                                     return ' Doanh thu: ' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
@@ -220,12 +438,13 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            border: { display: false },
                             grid: {
                                 color: 'rgba(15, 23, 42, 0.04)',
                                 drawBorder: false
                             },
                             ticks: {
-                                font: { size: 10, weight: '600' },
+                                font: { size: 10, weight: '700' },
                                 color: '#94a3b8',
                                 callback: function(value) {
                                     return new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(value);
@@ -233,15 +452,38 @@
                             }
                         },
                         x: {
+                            border: { display: false },
                             grid: { display: false },
                             ticks: {
-                                font: { size: 10, weight: '600' },
+                                font: { size: 10, weight: '700' },
                                 color: '#94a3b8'
                             }
                         }
                     }
                 }
             });
+
+            // Center Text Plugin for Doughnut Chart
+            const centerTextPlugin = {
+                id: 'centerText',
+                beforeDraw: function (chart) {
+                    if (chart.config.type === 'doughnut') {
+                        const { width, height, ctx } = chart;
+                        ctx.restore();
+                        const fontSize = (height / 140).toFixed(2);
+                        ctx.font = `bold ${fontSize}em "Plus Jakarta Sans", sans-serif`;
+                        ctx.textBaseline = "middle";
+
+                        const text = "@(Model.TongSoPhong > 0 ? (Model.PhongDangThue * 100 / Model.TongSoPhong) : 0)%";
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = Math.round((height - chart.legend.height) / 2);
+
+                        ctx.fillStyle = "#0f172a";
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }
+            };
 
             // Setup Room Occupancy Chart
             const ctxOccupancy = document.getElementById('occupancyChart').getContext('2d');
@@ -262,37 +504,39 @@
                             '#f59e0b'
                         ],
                         borderColor: '#ffffff',
-                        borderWidth: 3,
-                        offset: 4
+                        borderWidth: 4,
+                        offset: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '75%',
+                    cutout: '76%',
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
                                 usePointStyle: true,
                                 pointStyle: 'circle',
-                                padding: 15,
+                                padding: 16,
                                 font: { size: 11, weight: '700' },
                                 color: '#475569'
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1e293b',
+                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                            titleColor: '#0f172a',
                             bodyColor: '#475569',
                             borderColor: 'rgba(15, 23, 42, 0.05)',
                             borderWidth: 1,
-                            padding: 10,
-                            bodyFont: { weight: '700' }
+                            padding: 12,
+                            bodyFont: { size: 12, weight: '700' }
                         }
                     }
-                }
+                },
+                plugins: [centerTextPlugin]
             });
         });
     </script>
 }
+

@@ -3,9 +3,12 @@ using DoAn_QLTTT.Repositories;
 using DoAn_QLTTT.Repositories.Dapper;
 using DoAn_QLTTT.Repositories.Mock;
 using DoAn_QLTTT.Services;
+using Dapper;
 using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

@@ -27,11 +27,12 @@ public class MockSqlDemoService : ISqlDemoService
         return Task.FromResult(items);
     }
 
-    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(string? id, bool execute)
+    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(string? id, bool execute, string? sqlScript = null)
     {
         var definition = SqlDemoScenarioCatalog.Find(id);
         var model = BuildMockScenario(definition, execute);
-        model.SqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName);
+        var defaultSqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName);
+        model.SqlScript = string.IsNullOrWhiteSpace(sqlScript) ? defaultSqlScript : sqlScript;
         return model;
     }
 
@@ -49,94 +50,115 @@ public class MockSqlDemoService : ISqlDemoService
 
         switch (definition.Id)
         {
+            case "them-khach-thue":
+                model.BeforeTables = [Table("Bảng KHACHTHUE", ["MaKhach", "HoTen", "CCCD", "SoDienThoai", "DiaChi"])];
+                model.AfterTables = execute
+                    ? [Table("Bảng KHACHTHUE", ["MaKhach", "HoTen", "CCCD", "SoDienThoai", "DiaChi"], Row(31, "Nguyễn Văn Demo", "079199999999", "0909999999", "TP.HCM"))]
+                    : [];
+                model.OutputTitle = execute ? "MaKhachMoi = 31" : null;
+                model.OutputMessage = execute ? "SP_THEM_KHACHTHUE đã thêm khách mới và trả về mã khách." : null;
+                break;
+
             case "lap-hop-dong":
                 model.BeforeTables =
                 [
-                    Table("PhongTro", ["MaPhong", "SoPhong", "TrangThai"], Row("P101", "P101", "Trống")),
-                    Table("KhachThue", ["MaKhachThue", "HoTen", "SoDienThoai"], Row("KT001", "Nguyễn Văn A", "0901000001")),
-                    Table("HopDong", ["MaHopDong", "MaPhong", "MaKhachThue", "TrangThai"])
+                    Table("Bảng PHONGTRO", ["MaPhong", "SoPhong", "GiaThue", "SucChuaToiDa", "TrangThai"], Row(3, "P103", 1800000, 2, "Trống")),
+                    Table("Bảng KHACHTHUE", ["MaKhach", "HoTen", "CCCD", "SoDienThoai"], Row(31, "Nguyễn Văn Demo", "079199999999", "0909999999")),
+                    Table("Bảng HOPDONG", ["MaHopDong", "MaPhong", "MaKhachDaiDien", "NgayBatDau", "NgayKetThuc", "TienThueThang", "TrangThai"])
                 ];
                 model.AfterTables = execute
                     ? [
-                        Table("PhongTro", ["MaPhong", "SoPhong", "TrangThai"], Row("P101", "P101", "Đang thuê")),
-                        Table("HopDong", ["MaHopDong", "MaPhong", "MaKhachThue", "NgayLap", "TrangThai"], Row("HDG001", "P101", "KT001", "16/06/2026", "Hiệu lực"))
+                        Table("Bảng HOPDONG", ["MaHopDong", "MaPhong", "MaKhachDaiDien", "NgayBatDau", "NgayKetThuc", "TienThueThang", "TrangThai"], Row(21, 3, 31, new DateTime(2026, 6, 18), new DateTime(2027, 6, 18), 1800000, "Hiệu lực")),
+                        Table("Bảng PHONGTRO", ["MaPhong", "SoPhong", "TrangThai"], Row(3, "P103", "Đang thuê")),
+                        Table("Bảng CHITIETHOPDONG", ["MaHopDong", "MaKhach", "LaNguoiDaiDien"], Row(21, 31, true)),
+                        Table("Kết quả SQL", ["MaHopDongMoi", "SoNguoiTrongHopDong"], Row(21, 1))
                     ]
                     : [];
-                model.OutputMessage = execute ? "Đã giả lập thêm hợp đồng mới và cập nhật trạng thái phòng P101." : null;
+                model.OutputMessage = execute ? "SP_LAP_HOPDONG tạo hợp đồng, trigger đổi trạng thái phòng, function đếm 1 người trong hợp đồng." : null;
                 break;
 
-            case "trigger-trang-thai-phong":
+            case "ghi-chi-so":
                 model.BeforeTables =
                 [
-                    Table("PhongTro", ["MaPhong", "SoPhong", "TrangThai"], Row("P102", "P102", "Trống"))
+                    Table("Bảng DICHVU", ["MaDichVu", "TenDichVu", "DonVi", "DonGia", "LoaiTinhPhi"], Row(1, "Điện", "kWh", 3500, "TheoChiSo"), Row(2, "Nước", "m3", 18000, "TheoChiSo")),
+                    Table("Bảng CHISODIENNUOC", ["MaChiSo", "MaPhong", "TenDichVu", "Thang", "Nam", "ChiSoCu", "ChiSoMoi", "TieuThu"], Row(120, 3, "Điện", 6, 2026, 210, 280, 70))
                 ];
                 model.AfterTables = execute
                     ? [
-                        Table("HopDong", ["MaHopDong", "MaPhong", "TrangThai"], Row("HDG002", "P102", "Hiệu lực")),
-                        Table("PhongTro", ["MaPhong", "SoPhong", "TrangThai"], Row("P102", "P102", "Đang thuê"))
+                        Table("Bảng CHISODIENNUOC", ["MaChiSo", "MaPhong", "TenDichVu", "Thang", "Nam", "ChiSoCu", "ChiSoMoi", "TieuThu"], Row(121, 3, "Điện", 7, 2026, 280, 360, 80)),
+                        Table("Kết quả SQL", ["Function", "TienDienThang"], Row("FN_TINH_TIEN_CHISO", 280000))
                     ]
                     : [];
-                model.OutputMessage = execute ? "Trigger được giả lập: INSERT HopDong làm PhongTro chuyển sang Đang thuê." : null;
+                model.OutputMessage = execute ? "SP_GHI_CHISO_DICHVU ghi chỉ số mới, trigger giữ TieuThu = 80, function trả về 280.000." : null;
                 break;
 
-            case "trigger-tong-tien-hoa-don":
+            case "lap-hoa-don-thang":
                 model.BeforeTables =
                 [
-                    Table("HoaDon", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row("HD001", 0, 0, 0, "Chưa TT")),
-                    Table("ChiTietHoaDon", ["MaChiTiet", "MaHoaDon", "LoaiPhi", "ThanhTien"])
+                    Table("Bảng HOPDONG", ["MaHopDong", "MaPhong", "MaKhachDaiDien", "TienThueThang", "TrangThai"], Row(21, 3, 31, 1800000, "Hiệu lực")),
+                    Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "Thang", "Nam", "TongTien", "DaThanhToan", "ConLai", "TrangThai"])
                 ];
                 model.AfterTables = execute
                     ? [
-                        Table("ChiTietHoaDon", ["MaChiTiet", "MaHoaDon", "LoaiPhi", "ThanhTien"],
-                            Row("CT001", "HD001", "Tiền phòng", 2500000),
-                            Row("CT002", "HD001", "Tiền điện", 180000),
-                            Row("CT003", "HD001", "Tiền nước", 90000),
-                            Row("CT004", "HD001", "Wifi", 100000)),
-                        Table("HoaDon", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row("HD001", 2870000, 0, 2870000, "Chưa TT"))
+                        Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "Thang", "Nam", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row(54, 21, 7, 2026, 2310000, 0, 2310000, "Chưa TT")),
+                        Table("Bảng CHITIETHOADON", ["MaChiTiet", "MaHoaDon", "TenDichVu", "MoTa", "SoLuong", "DonGiaTaiThoiDiem", "ThanhTien"],
+                            Row(201, 54, "Tiền Thuê Phòng", "Tiền phòng tháng 07/2026", 1, 1800000, 1800000),
+                            Row(202, 54, "Điện", "Tiền Điện tháng 07/2026", 80, 3500, 280000),
+                            Row(203, 54, "Wifi", "Tiền Wifi tháng 07/2026", 1, 100000, 100000),
+                            Row(204, 54, "Rác", "Tiền Rác tháng 07/2026", 1, 30000, 30000),
+                            Row(205, 54, "Giữ Xe", "Tiền Giữ Xe tháng 07/2026", 1, 100000, 100000))
                     ]
                     : [];
-                model.OutputMessage = execute ? "Đã giả lập roll-up TongTien và ConLai từ các dòng chi tiết hóa đơn." : null;
+                model.OutputMessage = execute ? "SP_LAP_HOADON_THANG tạo hóa đơn, trigger cộng chi tiết thành TongTien = 2.310.000." : null;
                 break;
 
             case "ghi-nhan-thanh-toan":
                 model.BeforeTables =
                 [
-                    Table("HoaDon", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row("HD002", 3000000, 500000, 2500000, "Chưa TT"))
+                    Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row(54, 21, 2310000, 0, 2310000, "Chưa TT")),
+                    Table("Bảng THANHTOAN", ["MaThanhToan", "MaHoaDon", "MaNguoiThu", "SoTien", "NgayThu", "HinhThuc"])
                 ];
                 model.AfterTables = execute
                     ? [
-                        Table("ThanhToan", ["MaThanhToan", "MaHoaDon", "SoTien", "PhuongThuc"], Row("TT001", "HD002", 1500000, "Chuyển khoản")),
-                        Table("HoaDon", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row("HD002", 3000000, 2000000, 1000000, "Một phần"))
+                        Table("Bảng THANHTOAN", ["MaThanhToan", "MaHoaDon", "MaNguoiThu", "SoTien", "NgayThu", "HinhThuc"], Row(70, 54, 1, 1000000, new DateTime(2026, 6, 18), "ChuyenKhoan")),
+                        Table("Bảng HOADON", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row(54, 2310000, 1000000, 1310000, "Một phần"))
                     ]
                     : [];
-                model.OutputMessage = execute ? "Đã giả lập ghi nhận thanh toán 1.500.000 cho hóa đơn HD002." : null;
+                model.OutputMessage = execute ? "SP_GHI_NHAN_THANHTOAN thêm phiếu thu, trigger cập nhật công nợ hóa đơn." : null;
                 break;
 
-            case "function-tinh-cong-no":
+            case "tinh-cong-no-hop-dong":
                 model.BeforeTables =
                 [
-                    Table("HoaDon", ["MaHoaDon", "TongTien", "DaThanhToan", "ConLai"], Row("HD003", 3200000, 1200000, 2000000))
+                    Table("Bảng HOPDONG", ["MaHopDong", "MaPhong", "TrangThai", "TongCongNo"], Row(21, 3, "Hiệu lực", 1310000)),
+                    Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "TongTien", "DaThanhToan", "ConLai", "TrangThai"], Row(54, 21, 2310000, 1000000, 1310000, "Một phần"))
                 ];
                 model.AfterTables = execute
-                    ? [
-                        Table("Output", ["TenFunction", "MaHoaDon", "KetQuaFunction"], Row("fn_TinhCongNo", "HD003", 2000000))
-                    ]
+                    ? [Table("Kết quả SQL", ["Function", "MaHopDong", "TongCongNo"], Row("FN_TONG_CONGNO_HOPDONG", 21, 1310000))]
                     : [];
-                model.OutputTitle = execute ? "KetQuaFunction = TongTien - DaThanhToan" : null;
-                model.OutputMessage = execute ? "fn_TinhCongNo(HD003) trả về 2.000.000." : null;
+                model.OutputMessage = execute ? "Function cộng toàn bộ ConLai của hóa đơn thuộc hợp đồng 21." : null;
                 break;
 
-            case "cursor-quet-qua-han":
+            case "quet-hoa-don-qua-han":
                 model.BeforeTables =
                 [
-                    Table("HoaDon", ["MaHoaDon", "HanThanhToan", "ConLai", "TrangThai"], Row("HD004", "10/06/2026", 1800000, "Chưa TT"))
+                    Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "TongTien", "DaThanhToan", "ConLai", "HanThanhToan", "TrangThai"], Row(40, 12, 3200000, 500000, 2700000, new DateTime(2026, 5, 10), "Chưa TT"))
                 ];
                 model.AfterTables = execute
-                    ? [
-                        Table("HoaDon", ["MaHoaDon", "HanThanhToan", "ConLai", "TrangThai"], Row("HD004", "10/06/2026", 1800000, "Quá hạn"))
-                    ]
+                    ? [Table("Bảng HOADON", ["MaHoaDon", "MaHopDong", "ConLai", "HanThanhToan", "TrangThai"], Row(40, 12, 2700000, new DateTime(2026, 5, 10), "Quá hạn"))]
                     : [];
-                model.OutputMessage = execute ? "Đã giả lập cursor quét hóa đơn quá hạn và cập nhật trạng thái HD004." : null;
+                model.OutputMessage = execute ? "SP_QUET_HOADON_QUAHAN dùng cursor cur_HoaDonQuaHan để chuyển hóa đơn quá hạn sang Quá hạn." : null;
+                break;
+
+            case "quet-hop-dong-het-han":
+                model.BeforeTables =
+                [
+                    Table("Bảng HOPDONG và PHONGTRO", ["MaHopDong", "MaPhong", "SoPhong", "NgayKetThuc", "TrangThai", "TongCongNo", "TrangThaiPhong"], Row(18, 10, "P401", new DateTime(2026, 5, 31), "Hiệu lực", 0, "Đang thuê"))
+                ];
+                model.AfterTables = execute
+                    ? [Table("Bảng HOPDONG và PHONGTRO", ["MaHopDong", "MaPhong", "SoPhong", "NgayKetThuc", "TrangThai", "TongCongNo", "TrangThaiPhong"], Row(18, 10, "P401", new DateTime(2026, 5, 31), "Đã kết thúc", 0, "Trống"))]
+                    : [];
+                model.OutputMessage = execute ? "SP_QUET_HOPDONG_HETHAN kết thúc hợp đồng hết hạn không còn nợ, trigger đưa phòng về Trống." : null;
                 break;
         }
 

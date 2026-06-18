@@ -20,18 +20,18 @@ public class SqlDemoController : AdminControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Execute(string id)
+    public async Task<IActionResult> Execute(string id, string? sqlScript)
     {
-        return View("Index", await BuildPageAsync(id, execute: true));
+        return View("Index", await BuildPageAsync(id, execute: true, sqlScript));
     }
 
-    private async Task<SqlDemoPageViewModel> BuildPageAsync(string? id, bool execute)
+    private async Task<SqlDemoPageViewModel> BuildPageAsync(string? id, bool execute, string? sqlScript = null)
     {
         return new SqlDemoPageViewModel
         {
             DataProvider = _sqlDemoService.DataProvider,
             Scenarios = await _sqlDemoService.GetScenariosAsync(),
-            SelectedScenario = await _sqlDemoService.GetScenarioAsync(id, execute)
+            SelectedScenario = await _sqlDemoService.GetScenarioAsync(id, execute, sqlScript)
         };
     }
 }
