@@ -146,32 +146,43 @@ public class SqlDemoService : ISqlDemoService
         using var connection = _context.CreateConnection();
         var sql = scenarioId switch
         {
-            "them-khach-thue" => $"SELECT MaKhach, HoTen, CCCD, SoDienThoai, DiaChi FROM KHACHTHUE WHERE CCCD = '{DemoCccd}';",
-            "lap-hop-dong" => $"""
-                SELECT TOP 5 MaPhong, SoPhong, GiaThue, SucChuaToiDa, TrangThai FROM PHONGTRO WHERE TrangThai = N'Trống' ORDER BY MaPhong;
-                SELECT TOP 5 MaKhach, HoTen, CCCD, SoDienThoai FROM KHACHTHUE WHERE CCCD = '{DemoCccd}' OR MaKhach IN (SELECT TOP 4 MaKhach FROM KHACHTHUE ORDER BY MaKhach DESC) ORDER BY MaKhach DESC;
-                SELECT TOP 5 MaHopDong, MaPhong, MaKhachDaiDien, NgayBatDau, NgayKetThuc, TienThueThang, TrangThai FROM HOPDONG ORDER BY MaHopDong DESC;
-                SELECT TOP 5 MaHopDong, MaKhach, LaNguoiDaiDien FROM CHITIETHOPDONG ORDER BY MaHopDong DESC;
+            "them-khach-thue" => "SELECT TOP 10 MaKhach, HoTen, CCCD, SoDienThoai, DiaChi FROM KHACHTHUE ORDER BY MaKhach DESC;",
+            "lap-hop-dong" => """
+                SELECT TOP 10 MaPhong, SoPhong, GiaThue, SucChuaToiDa, TrangThai FROM PHONGTRO ORDER BY MaPhong DESC;
+                SELECT TOP 10 MaKhach, HoTen, CCCD, SoDienThoai, DiaChi FROM KHACHTHUE ORDER BY MaKhach DESC;
+                SELECT TOP 10 MaHopDong, MaPhong, MaKhachDaiDien, NgayBatDau, NgayKetThuc, TienThueThang, TrangThai FROM HOPDONG ORDER BY MaHopDong DESC;
+                SELECT TOP 10 MaHopDong, MaKhach, LaNguoiDaiDien FROM CHITIETHOPDONG ORDER BY MaHopDong DESC;
                 """,
-            "ghi-chi-so" => $"""
-                SELECT MaDichVu, TenDichVu, DonVi, DonGia, LoaiTinhPhi FROM DICHVU WHERE LoaiTinhPhi = 'TheoChiSo' ORDER BY MaDichVu;
+            "ghi-chi-so" => """
+                SELECT TOP 10 MaDichVu, TenDichVu, DonVi, DonGia, LoaiTinhPhi FROM DICHVU ORDER BY MaDichVu DESC;
                 SELECT TOP 10 CS.MaChiSo, CS.MaPhong, DV.TenDichVu, CS.Thang, CS.Nam, CS.ChiSoCu, CS.ChiSoMoi, CS.TieuThu
                 FROM CHISODIENNUOC CS
                 INNER JOIN DICHVU DV ON CS.MaDichVu = DV.MaDichVu
                 ORDER BY CS.MaChiSo DESC;
                 """,
-            "lap-hoa-don-thang" => $"""
-                SELECT TOP 5 MaHopDong, MaPhong, MaKhachDaiDien, TienThueThang, TrangThai FROM HOPDONG WHERE TrangThai = N'Hiệu lực' ORDER BY MaHopDong DESC;
+            "lap-hoa-don-thang" => """
+                SELECT TOP 10 MaHopDong, MaPhong, MaKhachDaiDien, TienThueThang, TrangThai FROM HOPDONG ORDER BY MaHopDong DESC;
                 SELECT TOP 10 MaHoaDon, MaHopDong, Thang, Nam, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;
                 SELECT TOP 15 CT.MaChiTiet, CT.MaHoaDon, DV.TenDichVu, CT.MoTa, CT.SoLuong, CT.DonGiaTaiThoiDiem, CT.ThanhTien
                 FROM CHITIETHOADON CT
                 INNER JOIN DICHVU DV ON CT.MaDichVu = DV.MaDichVu
                 ORDER BY CT.MaChiTiet DESC;
                 """,
-            "ghi-nhan-thanh-toan" => "SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON WHERE ConLai > 0 ORDER BY MaHoaDon DESC; SELECT TOP 10 MaThanhToan, MaHoaDon, MaNguoiThu, SoTien, NgayThu, HinhThuc FROM THANHTOAN ORDER BY MaThanhToan DESC;",
-            "tinh-cong-no-hop-dong" => "SELECT TOP 5 HD.MaHopDong, HD.MaPhong, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo FROM HOPDONG HD ORDER BY HD.MaHopDong DESC; SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;",
-            "quet-hoa-don-qua-han" => "SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON WHERE ConLai > 0 ORDER BY HanThanhToan;",
-            "quet-hop-dong-het-han" => "SELECT TOP 10 HD.MaHopDong, HD.MaPhong, P.SoPhong, HD.NgayKetThuc, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo, P.TrangThai AS TrangThaiPhong FROM HOPDONG HD INNER JOIN PHONGTRO P ON HD.MaPhong = P.MaPhong ORDER BY HD.NgayKetThuc;",
+            "ghi-nhan-thanh-toan" => """
+                SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;
+                SELECT TOP 10 MaThanhToan, MaHoaDon, MaNguoiThu, SoTien, NgayThu, HinhThuc FROM THANHTOAN ORDER BY MaThanhToan DESC;
+                """,
+            "tinh-cong-no-hop-dong" => """
+                SELECT TOP 10 HD.MaHopDong, HD.MaPhong, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo FROM HOPDONG HD ORDER BY HD.MaHopDong DESC;
+                SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;
+                """,
+            "quet-hoa-don-qua-han" => "SELECT TOP 10 MaHoaDon, MaHopDong, TongTien, DaThanhToan, ConLai, HanThanhToan, TrangThai FROM HOADON ORDER BY MaHoaDon DESC;",
+            "quet-hop-dong-het-han" => """
+                SELECT TOP 10 HD.MaHopDong, HD.MaPhong, P.SoPhong, HD.NgayKetThuc, HD.TrangThai, dbo.FN_TONG_CONGNO_HOPDONG(HD.MaHopDong) AS TongCongNo, P.TrangThai AS TrangThaiPhong
+                FROM HOPDONG HD
+                INNER JOIN PHONGTRO P ON HD.MaPhong = P.MaPhong
+                ORDER BY HD.MaHopDong DESC;
+                """,
             _ => "SELECT 1 AS KetQua;"
         };
 
