@@ -2,14 +2,6 @@
 
 Dự án ASP.NET Core MVC .NET 8 cho nghiệp vụ quản lý phòng trọ: phòng, khách thuê, hợp đồng, chỉ số điện nước, hóa đơn, thanh toán và nhắc nợ.
 
-## Trạng thái dữ liệu hiện tại
-
-Ứng dụng hiện đang cấu hình chạy với SQL Server thật:
-
-```json
-"DataProvider": "SqlServer"
-```
-
 Connection string mặc định:
 
 ```json

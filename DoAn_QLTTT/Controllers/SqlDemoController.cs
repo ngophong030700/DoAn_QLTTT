@@ -29,7 +29,6 @@ public class SqlDemoController : AdminControllerBase
     {
         return new SqlDemoPageViewModel
         {
-            DataProvider = _sqlDemoService.DataProvider,
             Scenarios = await _sqlDemoService.GetScenariosAsync(),
             SelectedScenario = await _sqlDemoService.GetScenarioAsync(id, execute, sqlScript)
         };

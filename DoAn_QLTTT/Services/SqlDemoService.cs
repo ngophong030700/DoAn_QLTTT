@@ -19,8 +19,6 @@ public class SqlDemoService : ISqlDemoService
         _scriptReader = scriptReader;
     }
 
-    public string DataProvider => "SqlServer";
-
     public Task<IReadOnlyList<SqlDemoScenarioSummaryViewModel>> GetScenariosAsync()
     {
         IReadOnlyList<SqlDemoScenarioSummaryViewModel> items = SqlDemoScenarioCatalog.Items
@@ -69,7 +67,7 @@ public class SqlDemoService : ISqlDemoService
         }
         catch (Exception ex)
         {
-            model.ErrorMessage = $"Chưa thể kết nối hoặc thực thi SQL Server. Kiểm tra DataProvider, connection string, câu SQL và object SQL thật. Chi tiết: {ex.Message}";
+            model.ErrorMessage = $"Chưa thể kết nối hoặc thực thi SQL Server. Kiểm tra connection string, câu SQL và object SQL thật. Chi tiết: {ex.Message}";
         }
 
         return model;

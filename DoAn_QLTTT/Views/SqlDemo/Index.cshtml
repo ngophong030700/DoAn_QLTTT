@@ -34,38 +34,6 @@
 }
 
 <div class="sql-demo-page container-fluid px-0">
-    <!-- Hero Banner with Cyber Tech aesthetics -->
-    <div class="sql-demo-hero mb-4 shadow-sm p-4 rounded-4 position-relative overflow-hidden">
-        <div class="position-relative z-2">
-            <span class="sql-demo-eyebrow text-uppercase fw-800 tracking-wider text-info"><i class="bi bi-cpu-fill me-1"></i>Interactive SQL Demo Hub</span>
-            <h1 class="display-6 fw-800 mt-1 mb-2 text-white">Trực quan hóa luồng nghiệp vụ quản lý phòng trọ</h1>
-            <p class="mb-0 max-w-700" style="color: rgba(241, 245, 249, 0.85) !important;">
-                Theo dõi quy trình hoạt động từ thêm khách thuê mới, lập hợp đồng, ghi chỉ số dịch vụ, phát hành hóa đơn đến thanh toán và rà soát định kỳ qua các câu lệnh SQL Server thực tế.
-            </p>
-        </div>
-        <div class="sql-demo-status d-flex flex-column align-items-end justify-content-center z-2 text-end">
-            <span class="badge @(Model.IsMock ? "bg-warning text-dark border-warning" : "bg-success text-white border-success") px-3 py-2 rounded-3 fs-7 mb-1 d-inline-flex align-items-center gap-2 shadow-sm">
-                <span class="spinner-grow spinner-grow-sm" role="status" style="width: 8px; height: 8px;"></span>
-                @(Model.IsMock ? "Đang chạy dữ liệu Mock" : "Kết nối SQL Server thật")
-            </span>
-            <span class="small" style="color: rgba(241, 245, 249, 0.8) !important;">Trạng thái Database</span>
-        </div>
-        <div class="hero-bg-decoration"></div>
-    </div>
-
-    @if (Model.IsMock)
-    {
-        <div class="alert alert-warning border-0 shadow-sm rounded-3 d-flex align-items-center gap-3 p-3 mb-4" role="alert">
-            <div class="bg-warning bg-opacity-25 text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
-                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-            </div>
-            <div>
-                <strong>Chế độ Mock Data đang hoạt động:</strong> Thao tác sẽ được giả lập cục bộ để chạy thử nghiệm nhanh. 
-                Khi chuyển sang Database thật (SQL Server) trong file cấu hình, hệ thống sẽ gọi trực tiếp các Stored Procedure, Trigger và Function trên máy chủ.
-            </div>
-        </div>
-    }
-
     <div class="row g-4">
         <!-- Sidebar: Roadmap Stepper -->
         <div class="col-12 col-xl-3">
@@ -75,7 +43,6 @@
                         <span class="sql-demo-eyebrow text-primary">Kịch bản</span>
                         <h2 class="h5 fw-800 text-dark mb-0">8 Bước Nghiệp Vụ</h2>
                     </div>
-                    <span class="badge bg-light text-primary border rounded-pill px-2.5 py-1 fw-700">SQL Server</span>
                 </div>
                 <div class="sql-demo-flow position-relative">
                     @for (var index = 0; index < Model.Scenarios.Count; index++)
@@ -178,7 +145,7 @@
                             </div>
                         </div>
 
-                        <!-- IDE Window UI Mock -->
+                        <!-- SQL editor -->
                         <div class="sql-editor-container rounded-3 overflow-hidden shadow">
                             <div class="sql-editor-header d-flex align-items-center justify-content-between px-3 py-2 bg-dark">
                                 <div class="mac-controls d-flex align-items-center gap-1.5">

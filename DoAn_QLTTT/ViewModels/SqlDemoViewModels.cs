@@ -2,8 +2,6 @@ namespace DoAn_QLTTT.ViewModels;
 
 public class SqlDemoPageViewModel
 {
-    public string DataProvider { get; set; } = "Mock";
-    public bool IsMock => DataProvider.Equals("Mock", StringComparison.OrdinalIgnoreCase);
     public IReadOnlyList<SqlDemoScenarioSummaryViewModel> Scenarios { get; set; } = [];
     public SqlDemoScenarioViewModel? SelectedScenario { get; set; }
 }
