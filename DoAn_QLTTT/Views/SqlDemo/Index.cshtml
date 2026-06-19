@@ -1,4 +1,6 @@
 @model SqlDemoPageViewModel
+@using System.Text.Json
+@using System.Text.RegularExpressions
 @{
     ViewData["Title"] = "Demo SQL";
     var scenario = Model.SelectedScenario;
@@ -30,6 +32,12 @@
         if (type.Contains("Procedure")) return "bg-success-subtle text-success border-success-subtle";
         if (type.Contains("Function")) return "bg-info-subtle text-info border-info-subtle";
         return "bg-light text-secondary border-secondary-subtle";
+    }
+
+    private string GetSqlValue(string sql, string pattern, string fallback = "")
+    {
+        var match = Regex.Match(sql, pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        return match.Success ? match.Groups["value"].Value.Replace("''", "'") : fallback;
     }
 }
 
@@ -96,18 +104,12 @@
                                 <h2 class="h3 fw-800 text-dark mt-1 mb-0">@scenario.Title</h2>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            @if (scenario.HasExecuted)
-                            {
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-3 fw-700 fs-7">
-                                    <i class="bi bi-check2-all me-1"></i>Đã thực thi thành công
-                                </span>
-                            }
-                            <button class="btn btn-primary btn-lg shadow-sm px-4 py-2.5 rounded-3 d-flex align-items-center gap-2 fw-700" type="submit" form="sql-demo-execute-form">
-                                <i class="bi bi-play-circle-fill fs-5"></i>
-                                Chạy câu lệnh (Ctrl+Enter)
-                            </button>
-                        </div>
+                        @if (scenario.HasExecuted)
+                        {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-3 fw-700 fs-7">
+                                <i class="bi bi-check2-all me-1"></i>Đã thực thi thành công
+                            </span>
+                        }
                     </div>
                 </div>
 
@@ -116,7 +118,6 @@
                     <!-- B1: Problem Scenario -->
                     <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
                         <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
-                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B1</div>
                             <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-chat-left-quote-fill text-muted me-1"></i>Yêu cầu nghiệp vụ & Bài toán đặt ra</h3>
                         </div>
                         <div class="p-3 bg-light rounded-3 border-start border-primary border-3 mb-3">
@@ -128,49 +129,110 @@
                         </div>
                     </div>
 
-                    <!-- B2: Interactive Code Editor -->
+                    <!-- B2: Scenario parameters and generated SQL -->
                     <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
                         <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B2</div>
-                                <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-code-slash text-muted me-1"></i>Câu truy vấn SQL có thể chỉnh sửa</h3>
+                                <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-code-slash text-muted me-1"></i>Tham số kịch bản & câu truy vấn SQL</h3>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" id="btn-reset-sql" title="Khôi phục câu lệnh mặc định">
+                                <button type="button" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" id="btn-reset-sql" title="Khôi phục tham số mặc định">
                                     <i class="bi bi-arrow-counterclockwise"></i> Reset
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" id="btn-copy-sql" title="Sao chép câu lệnh">
                                     <i class="bi bi-clipboard"></i> Copy
                                 </button>
+                                <button class="btn btn-sm btn-primary d-flex align-items-center gap-1" type="submit" form="sql-demo-execute-form">
+                                    <i class="bi bi-play-fill"></i> Thực thi
+                                </button>
                             </div>
                         </div>
 
-                        <!-- SQL editor -->
-                        <div class="sql-editor-container rounded-3 overflow-hidden shadow">
-                            <div class="sql-editor-header d-flex align-items-center justify-content-between px-3 py-2 bg-dark">
-                                <div class="mac-controls d-flex align-items-center gap-1.5">
-                                    <span class="control-dot close"></span>
-                                    <span class="control-dot minimize"></span>
-                                    <span class="control-dot maximize"></span>
+                        <form id="sql-demo-execute-form" asp-controller="SqlDemo" asp-action="Execute" method="post">
+                            <input type="hidden" name="id" value="@scenario.Id" />
+                            <div class="row g-3 sql-demo-builder">
+                                <div class="col-12 col-lg-4">
+                                    <div class="sql-parameter-panel h-100 rounded-3 border bg-light p-3">
+                                        <div class="fw-800 text-dark mb-1">Giá trị kịch bản</div>
+                                        <p class="small text-secondary mb-3">Thay đổi giá trị để tự động tạo lại câu SQL.</p>
+                                        <div id="sql-parameter-form" class="d-grid gap-3">
+                                            @switch (scenario.Id)
+                                            {
+                                                case "them-khach-thue":
+                                                    <div><label class="form-label">Họ tên</label><input id="param-ho-ten" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@HoTen\s*=\s*N'(?<value>(?:''|[^'])*)'", "Nguyễn Văn Demo")" /></div>
+                                                    <div><label class="form-label">CCCD</label><input id="param-cccd" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@CCCD\s*=\s*'(?<value>(?:''|[^'])*)'", "079199999999")" /></div>
+                                                    <div><label class="form-label">Số điện thoại</label><input id="param-so-dien-thoai" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@SoDienThoai\s*=\s*'(?<value>(?:''|[^'])*)'", "0909999999")" /></div>
+                                                    <div><label class="form-label">Địa chỉ</label><input id="param-dia-chi" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@DiaChi\s*=\s*N'(?<value>(?:''|[^'])*)'", "TP.HCM")" /></div>
+                                                    break;
+                                                case "lap-hop-dong":
+                                                    <div><label class="form-label">CCCD khách đại diện</label><input id="param-cccd" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"WHERE\s+CCCD\s*=\s*'(?<value>(?:''|[^'])*)'", "079199999999")" /></div>
+                                                    <div><label class="form-label">Ngày bắt đầu</label><input id="param-ngay-bat-dau" type="date" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@NgayBatDau\s*=\s*'(?<value>[^']*)'", "2026-06-18")" /></div>
+                                                    <div><label class="form-label">Ngày kết thúc</label><input id="param-ngay-ket-thuc" type="date" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@NgayKetThuc\s*=\s*'(?<value>[^']*)'", "2027-06-18")" /></div>
+                                                    <div><label class="form-label">Tiền cọc</label><input id="param-tien-coc" type="number" min="0" step="100000" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@TienCoc\s*=\s*(?<value>\d+)", "3000000")" /></div>
+                                                    break;
+                                                case "ghi-chi-so":
+                                                    <div><label class="form-label">Mã người nhập</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@MaNguoiNhap\s*=\s*(?<value>\d+)", "1")" /></div>
+                                                    <div><label class="form-label">Tháng</label><input id="param-thang" type="number" min="1" max="12" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)", "7")" /></div>
+                                                    <div><label class="form-label">Năm</label><input id="param-nam" type="number" min="2000" max="2100" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)", "2026")" /></div>
+                                                    <div><label class="form-label">Mức tiêu thụ mới</label><input id="param-tieu-thu" type="number" min="0" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@ChiSoMoi\s*=\s*@ChiSoCu\s*\+\s*(?<value>\d+)", "80")" /></div>
+                                                    break;
+                                                case "lap-hoa-don-thang":
+                                                    <div><label class="form-label">Mã người lập</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@MaNguoiLap\s*=\s*(?<value>\d+)", "1")" /></div>
+                                                    <div><label class="form-label">Tháng</label><input id="param-thang" type="number" min="1" max="12" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)", "7")" /></div>
+                                                    <div><label class="form-label">Năm</label><input id="param-nam" type="number" min="2000" max="2100" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)", "2026")" /></div>
+                                                    break;
+                                                case "ghi-nhan-thanh-toan":
+                                                    <div><label class="form-label">Mã người thu</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@MaNguoiThu\s*=\s*(?<value>\d+)", "1")" /></div>
+                                                    <div><label class="form-label">Số tiền tối đa</label><input id="param-so-tien" type="number" min="1" step="100000" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"WHEN\s+ConLai\s*>=\s*(?<value>\d+)", "1000000")" /></div>
+                                                    <div><label class="form-label">Ngày thu</label><input id="param-ngay-thu" type="date" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"@NgayThu\s*=\s*'(?<value>[^']*)'", "2026-06-18")" /></div>
+                                                    <div><label class="form-label">Hình thức</label><select id="param-hinh-thuc" class="form-select sql-param"><option value="ChuyenKhoan">Chuyển khoản</option><option value="TienMat">Tiền mặt</option></select></div>
+                                                    break;
+                                                case "tinh-cong-no-hop-dong":
+                                                    <div>
+                                                        <label class="form-label">Mã hợp đồng</label>
+                                                        <input id="param-ma-hop-dong" type="number" min="1" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"SET\s+@MaHopDong\s*=\s*(?<value>\d+)", "")" placeholder="Để trống: hợp đồng mới nhất" />
+                                                        <div class="form-text">Để trống để hệ thống tự lấy hợp đồng mới nhất.</div>
+                                                    </div>
+                                                    break;
+                                                case "quet-hoa-don-qua-han":
+                                                case "quet-hop-dong-het-han":
+                                                    <div>
+                                                        <label class="form-label">Ngày quét dữ liệu</label>
+                                                        <input id="param-ngay-quet" type="date" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"<\s*'(?<value>\d{4}-\d{2}-\d{2})'", "")" />
+                                                        <div class="form-text">Để trống để sử dụng ngày hiện tại của SQL Server.</div>
+                                                    </div>
+                                                    break;
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="editor-tab-indicator font-monospace small" style="color: rgba(255, 255, 255, 0.8) !important;">
-                                    <i class="bi bi-filetype-sql text-warning me-1"></i>@scenario.Id.Replace("-", "_")_script.sql
+                                <div class="col-12 col-lg-8">
+                                    <div class="sql-editor-container rounded-3 overflow-hidden shadow h-100">
+                                        <div class="sql-editor-header d-flex align-items-center justify-content-between px-3 py-2 bg-dark">
+                                            <div class="mac-controls d-flex align-items-center gap-1.5">
+                                                <span class="control-dot close"></span>
+                                                <span class="control-dot minimize"></span>
+                                                <span class="control-dot maximize"></span>
+                                            </div>
+                                            <div class="editor-tab-indicator font-monospace small" style="color: rgba(255, 255, 255, 0.8) !important;">
+                                                <i class="bi bi-filetype-sql text-warning me-1"></i>@scenario.Id.Replace("-", "_")_script.sql
+                                            </div>
+                                            <div class="small" style="color: rgba(255, 255, 255, 0.6) !important;">Chỉ xem</div>
+                                        </div>
+                                        <textarea class="sql-demo-code sql-demo-editor font-monospace"
+                                                  id="sqlScriptTextarea"
+                                                  name="sqlScript"
+                                                  readonly
+                                                  spellcheck="false">@scenario.SqlScript</textarea>
+                                    </div>
                                 </div>
-                                <div class="small" style="color: rgba(255, 255, 255, 0.6) !important;">MS SQL Server</div>
                             </div>
-                            <textarea class="sql-demo-code sql-demo-editor font-monospace"
-                                      id="sqlScriptTextarea"
-                                      name="sqlScript"
-                                      form="sql-demo-execute-form"
-                                      spellcheck="false"
-                                      data-original-sql="@scenario.SqlScript">@scenario.SqlScript</textarea>
-                        </div>
+                        </form>
                     </div>
 
                     <!-- B3: Before State Data -->
                     <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
                         <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
-                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B3</div>
                             <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-table text-muted me-1"></i>Dữ liệu hiện trạng (Trước khi chạy)</h3>
                         </div>
                         <div class="sql-table-wrapper">
@@ -178,32 +240,9 @@
                         </div>
                     </div>
 
-                    <!-- B4: Live Execute Call-To-Action -->
-                    <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white bg-opacity-50">
-                        <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
-                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B4</div>
-                            <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-play-fill text-muted me-1"></i>Phát lệnh thực thi</h3>
-                        </div>
-                        <div class="sql-demo-execute-box p-4 rounded-3 d-flex align-items-center justify-content-between gap-4 flex-wrap bg-light border">
-                            <div class="flex-grow-1">
-                                <h4 class="h6 fw-800 text-dark mb-1">Chạy thử nghiệm script SQL trên cơ sở dữ liệu</h4>
-                                <p class="mb-0 text-secondary small">
-                                    Bạn có thể thay đổi các tham số, tên khách thuê, mã phòng, hoặc số tiền trực tiếp tại khung soạn thảo (B2) rồi nhấn nút bên cạnh. Hệ thống sẽ lưu giữ dữ liệu và hiển thị kết quả thay đổi.
-                                </p>
-                            </div>
-                            <form id="sql-demo-execute-form" asp-controller="SqlDemo" asp-action="Execute" method="post" class="m-0">
-                                <input type="hidden" name="id" value="@scenario.Id" />
-                                <button class="btn btn-primary btn-lg shadow-sm px-4 py-2.5 rounded-3 d-flex align-items-center gap-2 fw-700" type="submit">
-                                    <i class="bi bi-play-fill fs-5"></i>Thực thi ngay
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- B5: After State Data & Logs -->
+                    <!-- B4: After State Data & Logs -->
                     <div class="sql-demo-step-card shadow-sm rounded-4 p-4 border bg-white">
                         <div class="sql-demo-step-title border-bottom pb-3 mb-3 d-flex align-items-center gap-2">
-                            <div class="step-badge-wrap bg-primary bg-opacity-10 text-primary">B5</div>
                             <h3 class="h6 text-dark fw-800 mb-0"><i class="bi bi-terminal-fill text-muted me-1"></i>Trạng thái kết quả & Dữ liệu đầu ra (Sau khi chạy)</h3>
                         </div>
 
@@ -228,7 +267,7 @@
                                     <i class="bi bi-play-circle-fill fs-2"></i>
                                 </div>
                                 <h4 class="h6 fw-800 text-dark mb-1">Hệ thống đang chờ lệnh</h4>
-                                <p class="text-secondary small mb-0 max-w-450">Hãy click nút <strong>Thực thi ngay</strong> ở Bước 4 hoặc nhấn tổ hợp phím <strong>Ctrl + Enter</strong> để gửi script lên Server.</p>
+                                <p class="text-secondary small mb-0 max-w-450">Hãy điều chỉnh tham số tại B2 và nhấn <strong>Thực thi</strong> để gửi script lên Server.</p>
                             </div>
                         }
                         else
@@ -289,18 +328,111 @@
     <script>
         $(document).ready(function() {
             var textarea = document.getElementById("sqlScriptTextarea");
-            
-            // Set up Copy Button
+            var scenarioId = @Html.Raw(JsonSerializer.Serialize(scenario?.Id));
+            var originalSql = @Html.Raw(JsonSerializer.Serialize(scenario?.SqlScript ?? ""));
+            var originalValues = {};
+
+            $(".sql-param").each(function() {
+                originalValues[this.id] = this.value;
+            });
+
+            if (scenarioId === "ghi-nhan-thanh-toan") {
+                var methodMatch = originalSql.match(/@@HinhThuc\s*=\s*'((?:''|[^'])*)'/i);
+                var currentMethod = methodMatch ? methodMatch[1].replace(/''/g, "'") : "ChuyenKhoan";
+                $("#param-hinh-thuc").val(currentMethod);
+                originalValues["param-hinh-thuc"] = currentMethod;
+            }
+
+            function sqlString(value, unicode) {
+                return (unicode ? "N'" : "'") + String(value || "").replace(/'/g, "''") + "'";
+            }
+
+            function numberValue(id, fallback) {
+                var value = document.getElementById(id)?.value;
+                return /^\d+$/.test(value || "") ? value : fallback;
+            }
+
+            function replaceValue(sql, pattern, value) {
+                return sql.replace(pattern, function(_, prefix) {
+                    return prefix + value;
+                });
+            }
+
+            function updateSql() {
+                if (!textarea) return;
+
+                var sql = originalSql;
+                switch (scenarioId) {
+                    case "them-khach-thue":
+                        sql = replaceValue(sql, /(@@HoTen\s*=\s*)N'(?:''|[^'])*'/i, sqlString($("#param-ho-ten").val(), true));
+                        sql = replaceValue(sql, /(@@CCCD\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-cccd").val(), false));
+                        sql = replaceValue(sql, /(@@SoDienThoai\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-so-dien-thoai").val(), false));
+                        sql = replaceValue(sql, /(@@DiaChi\s*=\s*)N'(?:''|[^'])*'/i, sqlString($("#param-dia-chi").val(), true));
+                        break;
+                    case "lap-hop-dong":
+                        sql = replaceValue(sql, /(WHERE\s+CCCD\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-cccd").val(), false));
+                        sql = replaceValue(sql, /(@@NgayBatDau\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-bat-dau").val(), false));
+                        sql = replaceValue(sql, /(@@NgayKetThuc\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-ket-thuc").val(), false));
+                        sql = replaceValue(sql, /(@@TienCoc\s*=\s*)\d+/i, numberValue("param-tien-coc", "0"));
+                        break;
+                    case "ghi-chi-so":
+                        var month = numberValue("param-thang", "1");
+                        var year = numberValue("param-nam", "2026");
+                        sql = replaceValue(sql, /(@@MaNguoiNhap\s*=\s*)\d+/i, numberValue("param-ma-nguoi", "1"));
+                        sql = replaceValue(sql, /(@@Thang\s*=\s*)\d+/i, month);
+                        sql = replaceValue(sql, /(@@Nam\s*=\s*)\d+/i, year);
+                        sql = replaceValue(sql, /(@@ChiSoMoi\s*=\s*@@ChiSoCu\s*\+\s*)\d+/i, numberValue("param-tieu-thu", "0"));
+                        sql = sql.replace(/DATEFROMPARTS\(\d+,\s*\d+,\s*1\)/i, "DATEFROMPARTS(" + year + ", " + month + ", 1)");
+                        sql = sql.replace(/FN_TINH_TIEN_CHISO\(([^,]+),\s*([^,]+),\s*\d+,\s*\d+\)/i, function(_, room, service) {
+                            return "FN_TINH_TIEN_CHISO(" + room + ", " + service + ", " + month + ", " + year + ")";
+                        });
+                        sql = replaceValue(sql, /(CS\.Thang\s*=\s*)\d+/i, month);
+                        sql = replaceValue(sql, /(CS\.Nam\s*=\s*)\d+/i, year);
+                        break;
+                    case "lap-hoa-don-thang":
+                        sql = replaceValue(sql, /(@@MaNguoiLap\s*=\s*)\d+/i, numberValue("param-ma-nguoi", "1"));
+                        sql = replaceValue(sql, /(@@Thang\s*=\s*)\d+/i, numberValue("param-thang", "1"));
+                        sql = replaceValue(sql, /(@@Nam\s*=\s*)\d+/i, numberValue("param-nam", "2026"));
+                        break;
+                    case "ghi-nhan-thanh-toan":
+                        var amount = numberValue("param-so-tien", "1");
+                        sql = replaceValue(sql, /(WHEN\s+ConLai\s*>=\s*)\d+/i, amount);
+                        sql = replaceValue(sql, /(THEN\s+)\d+/i, amount);
+                        sql = replaceValue(sql, /(@@MaNguoiThu\s*=\s*)\d+/i, numberValue("param-ma-nguoi", "1"));
+                        sql = replaceValue(sql, /(@@NgayThu\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-thu").val(), false));
+                        sql = replaceValue(sql, /(@@HinhThuc\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-hinh-thuc").val(), false));
+                        break;
+                    case "tinh-cong-no-hop-dong":
+                        var contractId = numberValue("param-ma-hop-dong", "");
+                        if (contractId) {
+                            sql = sql.replace(/SELECT\s+TOP\s+1\s+@@MaHopDong\s*=\s*MaHopDong\s+FROM\s+HOPDONG\s+ORDER\s+BY\s+MaHopDong\s+DESC;/i, "SET @@MaHopDong = " + contractId + ";");
+                            sql = replaceValue(sql, /(SET\s+@@MaHopDong\s*=\s*)\d+/i, contractId);
+                        }
+                        break;
+                    case "quet-hoa-don-qua-han":
+                    case "quet-hop-dong-het-han":
+                        var scanDate = $("#param-ngay-quet").val();
+                        if (scanDate) {
+                            sql = sql.replace(/CAST\(GETDATE\(\)\s+AS\s+DATE\)/gi, sqlString(scanDate, false));
+                            sql = replaceValue(sql, /(<\s*)'\d{4}-\d{2}-\d{2}'/i, sqlString(scanDate, false));
+                        }
+                        break;
+                }
+
+                textarea.value = sql;
+            }
+
+            $(".sql-param").on("input change", updateSql);
+
             $("#btn-copy-sql").click(function() {
                 if (textarea) {
                     textarea.select();
-                    textarea.setSelectionRange(0, 99999); // For mobile devices
+                    textarea.setSelectionRange(0, textarea.value.length);
                     
                     try {
                         navigator.clipboard.writeText(textarea.value).then(function() {
                             showToast();
                         }, function() {
-                            // Fallback
                             document.execCommand("copy");
                             showToast();
                         });
@@ -311,31 +443,15 @@
                 }
             });
 
-            // Set up Reset Button
             $("#btn-reset-sql").click(function() {
                 if (textarea) {
-                    var original = $(textarea).data("original-sql");
-                    if (original) {
-                        textarea.value = original;
-                        
-                        // Flash text area
-                        $(textarea).addClass("border-primary");
-                        setTimeout(function() {
-                            $(textarea).removeClass("border-primary");
-                        }, 500);
-                    }
+                    Object.keys(originalValues).forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input) input.value = originalValues[id];
+                    });
+                    textarea.value = originalSql;
                 }
             });
-
-            // Support running with Ctrl + Enter
-            if (textarea) {
-                $(textarea).keydown(function(e) {
-                    if (e.ctrlKey && e.keyCode === 13) {
-                        e.preventDefault();
-                        $("#sql-demo-execute-form").submit();
-                    }
-                });
-            }
 
             function showToast() {
                 var toastEl = document.getElementById('copyToast');

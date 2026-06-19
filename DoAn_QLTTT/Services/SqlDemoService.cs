@@ -67,7 +67,7 @@ public class SqlDemoService : ISqlDemoService
         }
         catch (Exception ex)
         {
-            model.ErrorMessage = $"Chưa thể kết nối hoặc thực thi SQL Server. Kiểm tra connection string, câu SQL và object SQL thật. Chi tiết: {ex.Message}";
+            model.ErrorMessage = $"Lỗi thực thi script: {ex.Message}";
         }
 
         return model;

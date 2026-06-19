@@ -926,6 +926,38 @@ body {
     box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
+.sql-demo-code.sql-demo-editor[readonly] {
+    cursor: default;
+}
+
+.sql-parameter-panel {
+    min-height: 100%;
+}
+
+.sql-parameter-panel .form-label {
+    margin-bottom: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.sql-parameter-panel .form-control,
+.sql-parameter-panel .form-select {
+    background-color: #fff;
+    font-size: 0.86rem;
+}
+
+@media (min-width: 992px) {
+    .sql-demo-builder .sql-editor-container,
+    .sql-demo-builder .sql-parameter-panel {
+        min-height: 430px;
+    }
+
+    .sql-demo-builder .sql-demo-code.sql-demo-editor {
+        min-height: 391px;
+    }
+}
+
 /* Code area highlight transitions */
 .sql-demo-editor.border-primary {
     border: 1px solid var(--primary) !important;
