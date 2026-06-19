@@ -1,0 +1,21 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Không có quyền truy cập</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light">
+    <main class="min-vh-100 d-flex align-items-center justify-content-center p-4">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold text-danger">403</h1>
+            <p class="text-secondary">Tài khoản của bạn không có quyền thực hiện thao tác này.</p>
+            <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Về trang báo cáo</a>
+        </div>
+    </main>
+</body>
+</html>

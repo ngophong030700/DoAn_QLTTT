@@ -926,6 +926,57 @@ body {
     box-shadow: inset 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
+.login-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 35%),
+        #f4f7fb;
+}
+
+.login-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.login-card {
+    width: min(100%, 430px);
+    padding: 32px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 20px;
+    background: #fff;
+}
+
+.login-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.login-brand img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+}
+
+.login-brand h1 {
+    margin: 0 0 4px;
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.login-brand p {
+    margin: 0;
+    color: #64748b;
+}
+
+.login-card .validation-summary-valid {
+    display: none;
+}
+
 .sql-demo-code.sql-demo-editor[readonly] {
     cursor: default;
 }

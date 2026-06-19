@@ -23,8 +23,30 @@ public class DichVuDapperRepository(DapperContext context)
 public class ChiSoDienNuocDapperRepository(DapperContext context)
     : DapperCrudRepository<ChiSoDienNuoc>(context, "ChiSoDienNuoc", "MaChiSo", "sp_ChiSoDienNuoc_Insert", "sp_ChiSoDienNuoc_Update", "sp_ChiSoDienNuoc_Delete"), IChiSoDienNuocRepository;
 
-public class NguoiDungDapperRepository(DapperContext context)
-    : DapperCrudRepository<NguoiDung>(context, "NguoiDung", "MaNguoiDung", "sp_NguoiDung_Insert", "sp_NguoiDung_Update", "sp_NguoiDung_Delete"), INguoiDungRepository;
+public class NguoiDungDapperRepository : DapperCrudRepository<NguoiDung>, INguoiDungRepository
+{
+    private readonly DapperContext _context;
+
+    public NguoiDungDapperRepository(DapperContext context)
+        : base(context, "NguoiDung", "MaNguoiDung", "sp_NguoiDung_Insert", "sp_NguoiDung_Update", "sp_NguoiDung_Delete")
+    {
+        _context = context;
+    }
+
+    public async Task<NguoiDung?> AuthenticateAsync(string tenDangNhap, string matKhau)
+    {
+        using var connection = _context.CreateConnection();
+        return await connection.QueryFirstOrDefaultAsync<NguoiDung>(
+            """
+            SELECT TOP 1 MaNguoiDung, TenDangNhap, MatKhau, HoTen, VaiTro, DangHoatDong
+            FROM NGUOIDUNG
+            WHERE TenDangNhap = @TenDangNhap
+              AND MatKhau = @MatKhau
+              AND DangHoatDong = 1;
+            """,
+            new { TenDangNhap = tenDangNhap, MatKhau = matKhau });
+    }
+}
 
 public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepository
 {

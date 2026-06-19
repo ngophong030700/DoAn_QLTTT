@@ -42,4 +42,5 @@ public interface IThanhToanRepository : ICrudRepository<ThanhToan, int>
 
 public interface INguoiDungRepository : ICrudRepository<NguoiDung, int>
 {
+    Task<NguoiDung?> AuthenticateAsync(string tenDangNhap, string matKhau);
 }

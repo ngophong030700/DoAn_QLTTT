@@ -93,6 +93,12 @@
                             @(ViewBag.CurrentUserName?.ToString()?.Substring(0, 1) ?? "A")
                         </div>
                     </div>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Đăng xuất">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-none d-lg-inline ms-1">Đăng xuất</span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
