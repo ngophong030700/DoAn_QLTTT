@@ -3,6 +3,13 @@
     ViewData["Title"] = "Nhắc nợ";
 }
 
+<div class="page-actions">
+    <form class="d-flex search-box" method="get">
+        <input class="form-control me-2" type="search" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm số phòng, họ tên, mã..." />
+        <button class="btn btn-outline-secondary" type="submit">Tìm</button>
+    </form>
+</div>
+
 <div class="table-card table-responsive">
     <table class="table align-middle">
         <thead>

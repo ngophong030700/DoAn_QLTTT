@@ -13,11 +13,12 @@ public class NhacNoController : AdminControllerBase
         _hoaDonRepository = hoaDonRepository;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? keyword)
     {
+        ViewBag.Keyword = keyword;
         return View(new NhacNoViewModel
         {
-            HoaDonQuaHans = await _hoaDonRepository.GetOverdueAsync()
+            HoaDonQuaHans = await _hoaDonRepository.GetOverdueAsync(keyword)
         });
     }
 }

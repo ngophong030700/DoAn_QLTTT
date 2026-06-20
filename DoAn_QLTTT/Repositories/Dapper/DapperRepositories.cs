@@ -245,16 +245,24 @@ public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepos
         return result.ToList();
     }
 
-    public async Task<IReadOnlyList<HoaDon>> GetOverdueAsync()
+    public async Task<IReadOnlyList<HoaDon>> GetOverdueAsync(string? keyword = null)
     {
         using var connection = _context.CreateConnection();
-        var result = await connection.QueryAsync<HoaDon>(
-            HoaDonSelect + """
+        var sql = HoaDonSelect + """
 
             WHERE HD.ConLai > 0
               AND HD.HanThanhToan < CAST(GETDATE() AS date)
+              AND (@Keyword IS NULL
+                   OR CAST(HD.MaHoaDon AS varchar(20)) LIKE '%' + @Keyword + '%'
+                   OR CAST(HD.MaHopDong AS varchar(20)) LIKE '%' + @Keyword + '%'
+                   OR P.SoPhong LIKE '%' + @Keyword + '%'
+                   OR KT.HoTen LIKE N'%' + @Keyword + N'%'
+                   OR HD.TrangThai LIKE N'%' + @Keyword + N'%')
             ORDER BY HD.HanThanhToan, HD.MaHoaDon;
-            """);
+            """;
+        var result = await connection.QueryAsync<HoaDon>(
+            sql,
+            new { Keyword = string.IsNullOrWhiteSpace(keyword) ? null : keyword.Trim() });
         return result.ToList();
     }
 

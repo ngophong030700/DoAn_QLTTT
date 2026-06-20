@@ -29,7 +29,7 @@ public interface IChiSoDienNuocRepository : ICrudRepository<ChiSoDienNuoc, int>
 public interface IHoaDonRepository : ICrudRepository<HoaDon, int>
 {
     Task<IReadOnlyList<HoaDon>> GetRecentAsync(int take);
-    Task<IReadOnlyList<HoaDon>> GetOverdueAsync();
+    Task<IReadOnlyList<HoaDon>> GetOverdueAsync(string? keyword = null);
     Task<IReadOnlyList<ChiTietHoaDon>> GetChiTietAsync(int maHoaDon);
     Task<int> AddChiTietAsync(ChiTietHoaDon chiTiet);
 }
