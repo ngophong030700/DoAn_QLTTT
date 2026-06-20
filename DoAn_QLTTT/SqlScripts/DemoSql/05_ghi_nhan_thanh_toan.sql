@@ -1,22 +1,11 @@
-DECLARE @MaHoaDon INT;
-DECLARE @SoTienThanhToan DECIMAL(18,0);
-
-SELECT TOP 1
-    @MaHoaDon = MaHoaDon,
-    @SoTienThanhToan =
-        CASE
-            WHEN ConLai >= 1000000 THEN 1000000
-            ELSE ConLai
-        END
-FROM HOADON
-WHERE ConLai > 0
-ORDER BY MaHoaDon DESC;
+DECLARE @MaHoaDon INT = 0;
+DECLARE @SoTienThanhToan DECIMAL(18,0) = 0;
 
 EXEC dbo.SP_GHI_NHAN_THANHTOAN
     @MaHoaDon = @MaHoaDon,
     @MaNguoiThu = 1,
     @SoTien = @SoTienThanhToan,
-    @NgayThu = '2026-06-18',
+    @NgayThu = '2026-06-20',
     @HinhThuc = 'ChuyenKhoan';
 
 SELECT TOP 1 MaThanhToan, MaHoaDon, MaNguoiThu, SoTien, NgayThu, HinhThuc

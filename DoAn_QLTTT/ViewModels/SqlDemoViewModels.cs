@@ -26,8 +26,24 @@ public class SqlDemoScenarioViewModel
     public string? OutputTitle { get; set; }
     public string? OutputMessage { get; set; }
     public string? ErrorMessage { get; set; }
+    public int CurrentUserId { get; set; } = 1;
+    public int? PreferredCustomerId { get; set; }
+    public int? CreatedCustomerId { get; set; }
+    public decimal? DebtAmount { get; set; }
+    public IReadOnlyList<SqlDemoOptionViewModel> RoomOptions { get; set; } = [];
+    public IReadOnlyList<SqlDemoOptionViewModel> CustomerOptions { get; set; } = [];
+    public IReadOnlyList<SqlDemoOptionViewModel> ServiceOptions { get; set; } = [];
+    public IReadOnlyList<SqlDemoOptionViewModel> ContractOptions { get; set; } = [];
+    public IReadOnlyList<SqlDemoOptionViewModel> InvoiceOptions { get; set; } = [];
     public IReadOnlyList<SqlDemoTableViewModel> BeforeTables { get; set; } = [];
     public IReadOnlyList<SqlDemoTableViewModel> AfterTables { get; set; } = [];
+}
+
+public class SqlDemoOptionViewModel
+{
+    public int Value { get; set; }
+    public string Label { get; set; } = "";
+    public decimal? Amount { get; set; }
 }
 
 public class SqlDemoTableViewModel

@@ -49,7 +49,7 @@
             "ghi-chi-so" => "Ghi chỉ số",
             "lap-hoa-don-thang" => "Lập hóa đơn",
             "ghi-nhan-thanh-toan" => "Ghi nhận thanh toán",
-            "tinh-cong-no-hop-dong" => "Tính công nợ",
+            "tinh-cong-no-hop-dong" => "Xem nợ",
             "quet-hoa-don-qua-han" => "Quét hóa đơn",
             "quet-hop-dong-het-han" => "Quét hợp đồng",
             _ => "Thực thi"
@@ -192,38 +192,142 @@
                                                 case "them-khach-thue":
                                                     <div><label class="form-label">Họ tên</label><input id="param-ho-ten" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@HoTen\s*=\s*N'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: Nguyễn Văn Demo" required /></div>
                                                     <div><label class="form-label">CCCD</label><input id="param-cccd" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@CCCD\s*=\s*'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: 079199999999" required /></div>
-                                                    <div><label class="form-label">Số điện thoại</label><input id="param-so-dien-thoai" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@SoDienThoai\s*=\s*'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: 0909999999" required /></div>
-                                                    <div><label class="form-label">Địa chỉ</label><input id="param-dia-chi" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@DiaChi\s*=\s*N'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: TP.HCM" required /></div>
+                                                    <div><label class="form-label">Số điện thoại</label><input id="param-so-dien-thoai" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@SoDienThoai\s*=\s*'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: 0909999999" /></div>
+                                                    <div><label class="form-label">Địa chỉ</label><input id="param-dia-chi" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@DiaChi\s*=\s*N'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: TP.HCM" /></div>
                                                     break;
                                                 case "lap-hop-dong":
-                                                    <div><label class="form-label">CCCD khách đại diện</label><input id="param-cccd" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"WHERE\s+CCCD\s*=\s*'(?<value>(?:''|[^'])*)'") : "")" placeholder="Ví dụ: 079199999999" required /></div>
-                                                    <div><label class="form-label">Ngày bắt đầu</label><input id="param-ngay-bat-dau" type="date" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@NgayBatDau\s*=\s*'(?<value>[^']*)'") : "")" required /></div>
-                                                    <div><label class="form-label">Ngày kết thúc</label><input id="param-ngay-ket-thuc" type="date" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@NgayKetThuc\s*=\s*'(?<value>[^']*)'") : "")" required /></div>
-                                                    <div><label class="form-label">Tiền cọc</label><input id="param-tien-coc" type="number" min="0" step="100000" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@TienCoc\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 3000000" required /></div>
+                                                    {
+                                                        var selectedRoom = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaPhong\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        var selectedCustomer = scenario.HasExecuted
+                                                            ? GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaKhachDaiDien\s+INT\s*=\s*(?<value>\d+)", "")
+                                                            : scenario.PreferredCustomerId?.ToString() ?? "";
+                                                        var startDate = scenario.HasExecuted
+                                                            ? GetSqlValue(scenario.SqlScript, @"@NgayBatDau\s*=\s*'(?<value>[^']*)'")
+                                                            : DateTime.Today.ToString("yyyy-MM-dd");
+                                                        var endDate = scenario.HasExecuted
+                                                            ? GetSqlValue(scenario.SqlScript, @"@NgayKetThuc\s*=\s*'(?<value>[^']*)'")
+                                                            : DateTime.Today.AddYears(1).ToString("yyyy-MM-dd");
+                                                        <div>
+                                                            <label class="form-label">Phòng cho thuê</label>
+                                                            <select id="param-ma-phong" class="form-select sql-param" required>
+                                                                <option value="">Chọn phòng đang trống</option>
+                                                                @foreach (var option in scenario.RoomOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedRoom ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label">Khách đại diện</label>
+                                                            <select id="param-ma-khach" class="form-select sql-param" required>
+                                                                <option value="">Chọn khách thuê</option>
+                                                                @foreach (var option in scenario.CustomerOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedCustomer ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div><label class="form-label">Ngày bắt đầu</label><input id="param-ngay-bat-dau" type="date" class="form-control sql-param" value="@startDate" required /></div>
+                                                        <div><label class="form-label">Ngày kết thúc</label><input id="param-ngay-ket-thuc" type="date" class="form-control sql-param" value="@endDate" required /></div>
+                                                        <div><label class="form-label">Tiền đặt cọc</label><input id="param-tien-coc" type="number" min="0" step="100000" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@TienCoc\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 3000000" required /></div>
+                                                        <div class="form-text"><i class="bi bi-info-circle me-1"></i>Giá thuê hằng tháng tự động lấy theo cấu hình gốc của phòng.</div>
+                                                    }
                                                     break;
                                                 case "ghi-chi-so":
-                                                    <div><label class="form-label">Mã người nhập</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@MaNguoiNhap\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 1" required /></div>
-                                                    <div><label class="form-label">Tháng</label><input id="param-thang" type="number" min="1" max="12" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 7" required /></div>
-                                                    <div><label class="form-label">Năm</label><input id="param-nam" type="number" min="2000" max="2100" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 2026" required /></div>
-                                                    <div><label class="form-label">Mức tiêu thụ mới</label><input id="param-tieu-thu" type="number" min="0" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@ChiSoMoi\s*=\s*@ChiSoCu\s*\+\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 80" required /></div>
+                                                    {
+                                                        var selectedRoom = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaPhong\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        var selectedService = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaDichVu\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        var selectedMonth = scenario.HasExecuted
+                                                            ? $"{GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)", DateTime.Today.Year.ToString())}-{GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)", DateTime.Today.Month.ToString()).PadLeft(2, '0')}"
+                                                            : DateTime.Today.ToString("yyyy-MM");
+                                                        <div>
+                                                            <label class="form-label">Phòng cần ghi</label>
+                                                            <select id="param-ma-phong" class="form-select sql-param" required>
+                                                                <option value="">Chọn phòng đang thuê</option>
+                                                                @foreach (var option in scenario.RoomOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedRoom ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label">Loại dịch vụ</label>
+                                                            <select id="param-ma-dich-vu" class="form-select sql-param" required>
+                                                                <option value="">Chọn Điện/Nước</option>
+                                                                @foreach (var option in scenario.ServiceOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedService ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div><label class="form-label">Kỳ tháng/năm</label><input id="param-ky" type="month" class="form-control sql-param" value="@selectedMonth" required /></div>
+                                                        <div><label class="form-label">Chỉ số cũ</label><input id="param-chi-so-cu" type="number" class="form-control" value="0" readonly /></div>
+                                                        <div><label class="form-label">Chỉ số mới</label><input id="param-chi-so-moi" type="number" min="0" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"DECLARE\s+@ChiSoMoi\s+INT\s*=\s*(?<value>\d+)") : "")" placeholder="Nhập chỉ số công tơ hiện tại" required /></div>
+                                                        <div class="form-text"><i class="bi bi-info-circle me-1"></i>Chỉ số cũ và lượng tiêu thụ sẽ được hệ thống tự động tính toán.</div>
+                                                    }
                                                     break;
                                                 case "lap-hoa-don-thang":
-                                                    <div><label class="form-label">Mã người lập</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@MaNguoiLap\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 1" required /></div>
-                                                    <div><label class="form-label">Tháng</label><input id="param-thang" type="number" min="1" max="12" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 7" required /></div>
-                                                    <div><label class="form-label">Năm</label><input id="param-nam" type="number" min="2000" max="2100" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 2026" required /></div>
+                                                    {
+                                                        var selectedContract = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaHopDong\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        var selectedMonth = scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Thang\s*=\s*(?<value>\d+)") : DateTime.Today.Month.ToString();
+                                                        <div>
+                                                            <label class="form-label">Hợp đồng hiệu lực</label>
+                                                            <select id="param-ma-hop-dong" class="form-select sql-param" required>
+                                                                <option value="">Chọn hợp đồng</option>
+                                                                @foreach (var option in scenario.ContractOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedContract ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label">Tháng xuất hóa đơn</label>
+                                                            <select id="param-thang" class="form-select sql-param" required>
+                                                                @for (var month = 1; month <= 12; month++)
+                                                                {
+                                                                    <option value="@month" selected="@(month.ToString() == selectedMonth ? "selected" : null)">Tháng @month</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div><label class="form-label">Năm xuất hóa đơn</label><input id="param-nam" type="number" min="2000" max="2100" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@Nam\s*=\s*(?<value>\d+)") : DateTime.Today.Year)" required /></div>
+                                                        <div class="form-text"><i class="bi bi-info-circle me-1"></i>Tổng tiền sẽ được hệ thống tự động gom từ tiền phòng và điện nước.</div>
+                                                    }
                                                     break;
                                                 case "ghi-nhan-thanh-toan":
-                                                    <div><label class="form-label">Mã người thu</label><input id="param-ma-nguoi" type="number" min="1" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@MaNguoiThu\s*=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 1" required /></div>
-                                                    <div><label class="form-label">Số tiền tối đa</label><input id="param-so-tien" type="number" min="1" step="100000" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"WHEN\s+ConLai\s*>=\s*(?<value>\d+)") : "")" placeholder="Ví dụ: 1000000" required /></div>
-                                                    <div><label class="form-label">Ngày thu</label><input id="param-ngay-thu" type="date" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@NgayThu\s*=\s*'(?<value>[^']*)'") : "")" required /></div>
-                                                    <div><label class="form-label">Hình thức</label><select id="param-hinh-thuc" class="form-select sql-param" required><option value="" disabled selected>Ví dụ: Chuyển khoản</option><option value="ChuyenKhoan">Chuyển khoản</option><option value="TienMat">Tiền mặt</option></select></div>
+                                                    {
+                                                        var selectedInvoice = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaHoaDon\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        <div>
+                                                            <label class="form-label">Hóa đơn còn nợ</label>
+                                                            <select id="param-ma-hoa-don" class="form-select sql-param" required>
+                                                                <option value="">Chọn hóa đơn</option>
+                                                                @foreach (var option in scenario.InvoiceOptions)
+                                                                {
+                                                                    <option value="@option.Value"
+                                                                            data-debt="@option.Amount"
+                                                                            selected="@(option.Value.ToString() == selectedInvoice ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div><label class="form-label">Ngày thu tiền</label><input id="param-ngay-thu" type="date" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@NgayThu\s*=\s*'(?<value>[^']*)'") : DateTime.Today.ToString("yyyy-MM-dd"))" required /></div>
+                                                        <div><label class="form-label">Số tiền đóng</label><input id="param-so-tien" type="number" min="1" step="1000" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"DECLARE\s+@SoTienThanhToan\s+DECIMAL\(18,0\)\s*=\s*(?<value>\d+)") : "")" placeholder="Nhập số tiền khách đóng" required /></div>
+                                                        <div class="form-text" id="payment-debt-note">Chọn hóa đơn để xem số nợ còn lại.</div>
+                                                        <div><label class="form-label">Hình thức thanh toán</label><select id="param-hinh-thuc" class="form-select sql-param" required><option value="">Chọn hình thức</option><option value="TienMat">Tiền mặt</option><option value="ChuyenKhoan">Chuyển khoản</option></select></div>
+                                                    }
                                                     break;
                                                 case "tinh-cong-no-hop-dong":
-                                                    <div>
-                                                        <label class="form-label">Mã hợp đồng</label>
-                                                        <input id="param-ma-hop-dong" type="number" min="1" class="form-control sql-param" value="@GetSqlValue(scenario.SqlScript, @"SET\s+@MaHopDong\s*=\s*(?<value>\d+)", "")" placeholder="Để trống: hợp đồng mới nhất" />
-                                                        <div class="form-text">Để trống để hệ thống tự lấy hợp đồng mới nhất.</div>
-                                                    </div>
+                                                    {
+                                                        var selectedContract = GetSqlValue(scenario.SqlScript, @"DECLARE\s+@MaHopDong\s+INT\s*=\s*(?<value>\d+)", "");
+                                                        <div>
+                                                            <label class="form-label">Hợp đồng</label>
+                                                            <select id="param-ma-hop-dong" class="form-select sql-param" required>
+                                                                <option value="">Chọn hợp đồng cần xem nợ</option>
+                                                                @foreach (var option in scenario.ContractOptions)
+                                                                {
+                                                                    <option value="@option.Value" selected="@(option.Value.ToString() == selectedContract ? "selected" : null)">@option.Label</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    }
                                                     break;
                                                 case "quet-hoa-don-qua-han":
                                                 case "quet-hop-dong-het-han":
@@ -328,6 +432,21 @@
                                     </div>
                                 </div>
                             }
+                            @if (scenario.CreatedCustomerId.HasValue)
+                            {
+                                <div class="alert alert-info border-0 bg-info bg-opacity-10 text-info-emphasis">
+                                    Mã khách vừa tạo:
+                                    <strong class="fs-5 ms-1">#@scenario.CreatedCustomerId.Value</strong>
+                                    <span class="d-block small mt-1">Mã khách này sẽ được ưu tiên chọn khi chuyển sang bước Lập hợp đồng.</span>
+                                </div>
+                            }
+                            @if (scenario.Id == "tinh-cong-no-hop-dong" && scenario.DebtAmount.HasValue)
+                            {
+                                <div class="text-center p-4 bg-light rounded-3 border mb-4">
+                                    <div class="text-secondary small mb-1">Tổng công nợ còn lại</div>
+                                    <div class="display-6 fw-800 text-danger">@FormatHelper.Money(scenario.DebtAmount.Value)</div>
+                                </div>
+                            }
                             <div class="sql-demo-result-data-title mt-2 mb-3 fw-800 text-uppercase tracking-wider small text-secondary d-flex align-items-center gap-1.5 border-bottom pb-2">
                                 <i class="bi bi-database-check text-success fs-5"></i> Dữ liệu sau biến động (Sau khi chạy)
                             </div>
@@ -356,6 +475,7 @@
             var textarea = document.getElementById("sqlScriptTextarea");
             var scenarioId = @Html.Raw(JsonSerializer.Serialize(scenario?.Id));
             var hasExecuted = @Html.Raw(JsonSerializer.Serialize(scenario?.HasExecuted ?? false));
+            var currentUserId = @Html.Raw(JsonSerializer.Serialize(scenario?.CurrentUserId ?? 1));
             var originalSql = @Html.Raw(JsonSerializer.Serialize(scenario?.SqlScript ?? ""));
             var reloadScrollKey = "sql-demo-reload-scroll";
             var savedScrollPosition = sessionStorage.getItem(reloadScrollKey);
@@ -381,6 +501,10 @@
                 return (unicode ? "N'" : "'") + String(value || "").replace(/'/g, "''") + "'";
             }
 
+            function sqlOptionalString(value, unicode) {
+                return String(value || "").trim() ? sqlString(value, unicode) : "NULL";
+            }
+
             function numberValue(id, fallback) {
                 var value = document.getElementById(id)?.value;
                 return /^\d+$/.test(value || "") ? value : fallback;
@@ -400,22 +524,26 @@
                     case "them-khach-thue":
                         sql = replaceValue(sql, /(@@HoTen\s*=\s*)N'(?:''|[^'])*'/i, sqlString($("#param-ho-ten").val(), true));
                         sql = replaceValue(sql, /(@@CCCD\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-cccd").val(), false));
-                        sql = replaceValue(sql, /(@@SoDienThoai\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-so-dien-thoai").val(), false));
-                        sql = replaceValue(sql, /(@@DiaChi\s*=\s*)N'(?:''|[^'])*'/i, sqlString($("#param-dia-chi").val(), true));
+                        sql = replaceValue(sql, /(@@SoDienThoai\s*=\s*)(?:NULL|'(?:''|[^'])*')/i, sqlOptionalString($("#param-so-dien-thoai").val(), false));
+                        sql = replaceValue(sql, /(@@DiaChi\s*=\s*)(?:NULL|N'(?:''|[^'])*')/i, sqlOptionalString($("#param-dia-chi").val(), true));
                         break;
                     case "lap-hop-dong":
-                        sql = replaceValue(sql, /(WHERE\s+CCCD\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-cccd").val(), false));
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaPhong\s+INT\s*=\s*)\d+/i, numberValue("param-ma-phong", "0"));
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaKhachDaiDien\s+INT\s*=\s*)\d+/i, numberValue("param-ma-khach", "0"));
                         sql = replaceValue(sql, /(@@NgayBatDau\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-bat-dau").val(), false));
                         sql = replaceValue(sql, /(@@NgayKetThuc\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-ket-thuc").val(), false));
                         sql = replaceValue(sql, /(@@TienCoc\s*=\s*)\d+/i, numberValue("param-tien-coc", ""));
                         break;
                     case "ghi-chi-so":
-                        var month = numberValue("param-thang", "");
-                        var year = numberValue("param-nam", "");
-                        sql = replaceValue(sql, /(@@MaNguoiNhap\s*=\s*)\d+/i, numberValue("param-ma-nguoi", ""));
+                        var period = ($("#param-ky").val() || "").split("-");
+                        var year = period[0] || "";
+                        var month = period[1] ? String(Number(period[1])) : "";
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaPhong\s+INT\s*=\s*)\d+/i, numberValue("param-ma-phong", "0"));
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaDichVu\s+INT\s*=\s*)\d+/i, numberValue("param-ma-dich-vu", "0"));
+                        sql = replaceValue(sql, /(DECLARE\s+@@ChiSoMoi\s+INT\s*=\s*)\d+/i, numberValue("param-chi-so-moi", "0"));
+                        sql = replaceValue(sql, /(@@MaNguoiNhap\s*=\s*)\d+/i, String(currentUserId));
                         sql = replaceValue(sql, /(@@Thang\s*=\s*)\d+/i, month);
                         sql = replaceValue(sql, /(@@Nam\s*=\s*)\d+/i, year);
-                        sql = replaceValue(sql, /(@@ChiSoMoi\s*=\s*@@ChiSoCu\s*\+\s*)\d+/i, numberValue("param-tieu-thu", ""));
                         sql = sql.replace(/DATEFROMPARTS\(\d+,\s*\d+,\s*1\)/i, "DATEFROMPARTS(" + year + ", " + month + ", 1)");
                         sql = sql.replace(/FN_TINH_TIEN_CHISO\(([^,]+),\s*([^,]+),\s*\d+,\s*\d+\)/i, function(_, room, service) {
                             return "FN_TINH_TIEN_CHISO(" + room + ", " + service + ", " + month + ", " + year + ")";
@@ -424,24 +552,21 @@
                         sql = replaceValue(sql, /(CS\.Nam\s*=\s*)\d+/i, year);
                         break;
                     case "lap-hoa-don-thang":
-                        sql = replaceValue(sql, /(@@MaNguoiLap\s*=\s*)\d+/i, numberValue("param-ma-nguoi", ""));
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaHopDong\s+INT\s*=\s*)\d+/i, numberValue("param-ma-hop-dong", "0"));
+                        sql = replaceValue(sql, /(@@MaNguoiLap\s*=\s*)\d+/i, String(currentUserId));
                         sql = replaceValue(sql, /(@@Thang\s*=\s*)\d+/i, numberValue("param-thang", ""));
                         sql = replaceValue(sql, /(@@Nam\s*=\s*)\d+/i, numberValue("param-nam", ""));
                         break;
                     case "ghi-nhan-thanh-toan":
-                        var amount = numberValue("param-so-tien", "");
-                        sql = replaceValue(sql, /(WHEN\s+ConLai\s*>=\s*)\d+/i, amount);
-                        sql = replaceValue(sql, /(THEN\s+)\d+/i, amount);
-                        sql = replaceValue(sql, /(@@MaNguoiThu\s*=\s*)\d+/i, numberValue("param-ma-nguoi", ""));
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaHoaDon\s+INT\s*=\s*)\d+/i, numberValue("param-ma-hoa-don", "0"));
+                        sql = replaceValue(sql, /(DECLARE\s+@@SoTienThanhToan\s+DECIMAL\(18,0\)\s*=\s*)\d+/i, numberValue("param-so-tien", "0"));
+                        sql = replaceValue(sql, /(@@MaNguoiThu\s*=\s*)\d+/i, String(currentUserId));
                         sql = replaceValue(sql, /(@@NgayThu\s*=\s*)'[^']*'/i, sqlString($("#param-ngay-thu").val(), false));
                         sql = replaceValue(sql, /(@@HinhThuc\s*=\s*)'(?:''|[^'])*'/i, sqlString($("#param-hinh-thuc").val(), false));
                         break;
                     case "tinh-cong-no-hop-dong":
                         var contractId = numberValue("param-ma-hop-dong", "");
-                        if (contractId) {
-                            sql = sql.replace(/SELECT\s+TOP\s+1\s+@@MaHopDong\s*=\s*MaHopDong\s+FROM\s+HOPDONG\s+ORDER\s+BY\s+MaHopDong\s+DESC;/i, "SET @@MaHopDong = " + contractId + ";");
-                            sql = replaceValue(sql, /(SET\s+@@MaHopDong\s*=\s*)\d+/i, contractId);
-                        }
+                        sql = replaceValue(sql, /(DECLARE\s+@@MaHopDong\s+INT\s*=\s*)\d+/i, contractId || "0");
                         break;
                     case "quet-hoa-don-qua-han":
                     case "quet-hop-dong-het-han":
@@ -457,6 +582,64 @@
             }
 
             $(".sql-param").on("input change", updateSql);
+
+            function syncContractDates() {
+                var start = $("#param-ngay-bat-dau").val();
+                var endInput = document.getElementById("param-ngay-ket-thuc");
+                if (!endInput) return;
+                endInput.min = start || "";
+                if (start && endInput.value && endInput.value <= start) {
+                    endInput.setCustomValidity("Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+                } else {
+                    endInput.setCustomValidity("");
+                }
+            }
+
+            function refreshPreviousReading() {
+                if (scenarioId !== "ghi-chi-so") return;
+                var roomId = $("#param-ma-phong").val();
+                var serviceId = $("#param-ma-dich-vu").val();
+                var period = ($("#param-ky").val() || "").split("-");
+                if (!roomId || !serviceId || period.length !== 2) {
+                    $("#param-chi-so-cu").val(0);
+                    $("#param-chi-so-moi").attr("min", 0);
+                    return;
+                }
+
+                $.getJSON("@Url.Action("PreviousReading", "SqlDemo")", {
+                    roomId: roomId,
+                    serviceId: serviceId,
+                    month: Number(period[1]),
+                    year: Number(period[0])
+                }).done(function(result) {
+                    var previous = Number(result.value || 0);
+                    $("#param-chi-so-cu").val(previous);
+                    $("#param-chi-so-moi").attr("min", previous);
+                });
+            }
+
+            function refreshPaymentLimit() {
+                if (scenarioId !== "ghi-nhan-thanh-toan") return;
+                var selected = $("#param-ma-hoa-don option:selected");
+                var debt = Number(selected.data("debt") || 0);
+                var amountInput = $("#param-so-tien");
+                if (debt > 0) {
+                    amountInput.attr("max", debt);
+                    $("#payment-debt-note").text("Số nợ còn lại: " + new Intl.NumberFormat("vi-VN").format(debt) + " đ.");
+                } else {
+                    amountInput.removeAttr("max");
+                    $("#payment-debt-note").text("Chọn hóa đơn để xem số nợ còn lại.");
+                }
+            }
+
+            $("#param-ngay-bat-dau, #param-ngay-ket-thuc").on("change", syncContractDates);
+            $("#param-ma-phong, #param-ma-dich-vu, #param-ky").on("change", refreshPreviousReading);
+            $("#param-ma-hoa-don").on("change", refreshPaymentLimit);
+
+            syncContractDates();
+            refreshPreviousReading();
+            refreshPaymentLimit();
+            updateSql();
 
             $("#btn-reset-sql").click(function() {
                 if (textarea) {

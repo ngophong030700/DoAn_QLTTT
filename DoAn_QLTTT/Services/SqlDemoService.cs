@@ -33,7 +33,12 @@ public class SqlDemoService : ISqlDemoService
         return Task.FromResult(items);
     }
 
-    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(string? id, bool execute, string? sqlScript = null)
+    public async Task<SqlDemoScenarioViewModel> GetScenarioAsync(
+        string? id,
+        bool execute,
+        string? sqlScript = null,
+        int? preferredCustomerId = null,
+        int? currentUserId = null)
     {
         var definition = SqlDemoScenarioCatalog.Find(id);
         var defaultSqlScript = await _scriptReader.ReadAsync(definition.ScriptFileName);
@@ -46,16 +51,21 @@ public class SqlDemoService : ISqlDemoService
             Problem = definition.Problem,
             Note = definition.Note,
             HasExecuted = execute,
-            SqlScript = effectiveSqlScript
+            SqlScript = effectiveSqlScript,
+            PreferredCustomerId = preferredCustomerId,
+            CurrentUserId = currentUserId ?? 1
         };
 
         try
         {
+            await LoadFormOptionsAsync(model);
             model.BeforeTables = await LoadPreviewTablesAsync(definition.Id);
 
             if (execute)
             {
                 var outputTables = await ExecuteSubmittedScriptAsync(effectiveSqlScript);
+                model.CreatedCustomerId = TryGetInt(outputTables, "MaKhachMoi");
+                model.DebtAmount = TryGetDecimal(outputTables, "TongCongNo");
                 model.OutputTitle = "Đã chạy câu SQL trên màn hình";
                 model.OutputMessage = outputTables.Count == 0
                     ? "Script đã thực thi thành công. Không có result set SELECT trả về."
@@ -71,6 +81,139 @@ public class SqlDemoService : ISqlDemoService
         }
 
         return model;
+    }
+
+    public async Task<int> GetPreviousReadingAsync(int roomId, int serviceId, int month, int year)
+    {
+        using var connection = _context.CreateConnection();
+        return await connection.QueryFirstOrDefaultAsync<int?>(
+            """
+            SELECT TOP 1 ChiSoMoi
+            FROM CHISODIENNUOC
+            WHERE MaPhong = @RoomId
+              AND MaDichVu = @ServiceId
+              AND DATEFROMPARTS(Nam, Thang, 1) < DATEFROMPARTS(@Year, @Month, 1)
+            ORDER BY Nam DESC, Thang DESC, MaChiSo DESC;
+            """,
+            new { RoomId = roomId, ServiceId = serviceId, Month = month, Year = year }) ?? 0;
+    }
+
+    private async Task LoadFormOptionsAsync(SqlDemoScenarioViewModel model)
+    {
+        using var connection = _context.CreateConnection();
+
+        switch (model.Id)
+        {
+            case "lap-hop-dong":
+                model.RoomOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        MaPhong AS Value,
+                        CONCAT(N'Phòng ', SoPhong, N' - ', FORMAT(GiaThue, 'N0'), N' đ/tháng') AS Label
+                    FROM PHONGTRO
+                    WHERE LTRIM(RTRIM(TrangThai)) IN (N'Trống', N'Trong')
+                    ORDER BY SoPhong;
+                    """)).ToList();
+                model.CustomerOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        MaKhach AS Value,
+                        CONCAT(HoTen, N' - CCCD: ', CCCD) AS Label
+                    FROM KHACHTHUE
+                    ORDER BY MaKhach DESC;
+                    """)).ToList();
+                break;
+
+            case "ghi-chi-so":
+                model.RoomOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        MaPhong AS Value,
+                        CONCAT(N'Phòng ', SoPhong) AS Label
+                    FROM PHONGTRO
+                    WHERE LTRIM(RTRIM(TrangThai)) IN (N'Đang thuê', N'Dang thue')
+                    ORDER BY SoPhong;
+                    """)).ToList();
+                model.ServiceOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        MaDichVu AS Value,
+                        CONCAT(TenDichVu, N' (', DonVi, N')') AS Label
+                    FROM DICHVU
+                    WHERE LoaiTinhPhi IN (N'TheoChiSo', N'Theo chỉ số', N'Theo chi so')
+                       OR TenDichVu IN (N'Điện', N'Nước', N'Dien', N'Nuoc')
+                    ORDER BY TenDichVu;
+                    """)).ToList();
+                break;
+
+            case "lap-hoa-don-thang":
+                model.ContractOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        HD.MaHopDong AS Value,
+                        CONCAT(N'HĐ #', HD.MaHopDong, N' - Phòng ', P.SoPhong, N' - ', KT.HoTen) AS Label
+                    FROM HOPDONG HD
+                    INNER JOIN PHONGTRO P ON P.MaPhong = HD.MaPhong
+                    INNER JOIN KHACHTHUE KT ON KT.MaKhach = HD.MaKhachDaiDien
+                    WHERE LTRIM(RTRIM(HD.TrangThai)) IN (N'Hiệu lực', N'Hieu luc')
+                    ORDER BY HD.MaHopDong DESC;
+                    """)).ToList();
+                break;
+
+            case "ghi-nhan-thanh-toan":
+                model.InvoiceOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        HD.MaHoaDon AS Value,
+                        CONCAT(N'Hóa đơn #', HD.MaHoaDon, N' - Phòng ', P.SoPhong, N' - Còn nợ ', FORMAT(HD.ConLai, 'N0'), N' đ') AS Label,
+                        HD.ConLai AS Amount
+                    FROM HOADON HD
+                    INNER JOIN HOPDONG HDG ON HDG.MaHopDong = HD.MaHopDong
+                    INNER JOIN PHONGTRO P ON P.MaPhong = HDG.MaPhong
+                    WHERE HD.ConLai > 0
+                    ORDER BY HD.HanThanhToan, HD.MaHoaDon DESC;
+                    """)).ToList();
+                break;
+
+            case "tinh-cong-no-hop-dong":
+                model.ContractOptions = (await connection.QueryAsync<SqlDemoOptionViewModel>(
+                    """
+                    SELECT
+                        HD.MaHopDong AS Value,
+                        CONCAT(N'HĐ #', HD.MaHopDong, N' - Phòng ', P.SoPhong, N' - ', KT.HoTen) AS Label
+                    FROM HOPDONG HD
+                    INNER JOIN PHONGTRO P ON P.MaPhong = HD.MaPhong
+                    INNER JOIN KHACHTHUE KT ON KT.MaKhach = HD.MaKhachDaiDien
+                    ORDER BY HD.MaHopDong DESC;
+                    """)).ToList();
+                break;
+        }
+    }
+
+    private static int? TryGetInt(IReadOnlyList<SqlDemoTableViewModel> tables, string column)
+    {
+        var value = TryGetValue(tables, column);
+        return value is null ? null : Convert.ToInt32(value);
+    }
+
+    private static decimal? TryGetDecimal(IReadOnlyList<SqlDemoTableViewModel> tables, string column)
+    {
+        var value = TryGetValue(tables, column);
+        return value is null ? null : Convert.ToDecimal(value);
+    }
+
+    private static object? TryGetValue(IReadOnlyList<SqlDemoTableViewModel> tables, string column)
+    {
+        foreach (var row in tables.SelectMany(x => x.Rows))
+        {
+            var match = row.FirstOrDefault(x => x.Key.Equals(column, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrEmpty(match.Key) && match.Value is not DBNull)
+            {
+                return match.Value;
+            }
+        }
+
+        return null;
     }
 
     private async Task<IReadOnlyList<SqlDemoTableViewModel>> ExecuteSubmittedScriptAsync(string sqlScript)

@@ -1,15 +1,10 @@
-DECLARE @MaHopDong INT;
+DECLARE @MaHopDong INT = 0;
 DECLARE @MaHoaDonMoi INT;
-
-SELECT TOP 1 @MaHopDong = MaHopDong
-FROM HOPDONG
-WHERE TrangThai = N'Hiệu lực'
-ORDER BY MaHopDong DESC;
 
 EXEC dbo.SP_LAP_HOADON_THANG
     @MaHopDong = @MaHopDong,
     @MaNguoiLap = 1,
-    @Thang = 7,
+    @Thang = 6,
     @Nam = 2026,
     @MaHoaDonMoi = @MaHoaDonMoi OUTPUT;
 

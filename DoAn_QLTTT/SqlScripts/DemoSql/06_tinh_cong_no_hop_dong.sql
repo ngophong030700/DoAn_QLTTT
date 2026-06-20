@@ -1,8 +1,4 @@
-DECLARE @MaHopDong INT;
-
-SELECT TOP 1 @MaHopDong = MaHopDong
-FROM HOPDONG
-ORDER BY MaHopDong DESC;
+DECLARE @MaHopDong INT = 0;
 
 SELECT
     @MaHopDong AS MaHopDong,

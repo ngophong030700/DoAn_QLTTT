@@ -1,34 +1,26 @@
-DECLARE @MaPhong INT;
-DECLARE @MaDichVuDien INT;
+DECLARE @MaPhong INT = 0;
+DECLARE @MaDichVu INT = 0;
 DECLARE @ChiSoCu INT;
-
-SELECT TOP 1 @MaPhong = MaPhong
-FROM HOPDONG
-WHERE TrangThai = N'Hiệu lực'
-ORDER BY MaHopDong DESC;
-
-SELECT @MaDichVuDien = MaDichVu
-FROM DICHVU
-WHERE TenDichVu = N'Điện';
+DECLARE @ChiSoMoi INT = 0;
 
 SELECT TOP 1 @ChiSoCu = ChiSoMoi
 FROM CHISODIENNUOC
 WHERE MaPhong = @MaPhong
-    AND MaDichVu = @MaDichVuDien
-    AND DATEFROMPARTS(Nam, Thang, 1) < DATEFROMPARTS(2026, 7, 1)
+    AND MaDichVu = @MaDichVu
+    AND DATEFROMPARTS(Nam, Thang, 1) < DATEFROMPARTS(2026, 6, 1)
 ORDER BY Nam DESC, Thang DESC;
 
 SET @ChiSoCu = ISNULL(@ChiSoCu, 0);
 
 EXEC dbo.SP_GHI_CHISO_DICHVU
     @MaPhong = @MaPhong,
-    @MaDichVu = @MaDichVuDien,
+    @MaDichVu = @MaDichVu,
     @MaNguoiNhap = 1,
-    @Thang = 7,
+    @Thang = 6,
     @Nam = 2026,
-    @ChiSoMoi = @ChiSoCu + 80;
+    @ChiSoMoi = @ChiSoMoi;
 
-SELECT dbo.FN_TINH_TIEN_CHISO(@MaPhong, @MaDichVuDien, 7, 2026) AS TienDienThang;
+SELECT dbo.FN_TINH_TIEN_CHISO(@MaPhong, @MaDichVu, 6, 2026) AS TienDichVuThang;
 
 SELECT TOP 1
     CS.MaChiSo,
@@ -42,7 +34,7 @@ SELECT TOP 1
 FROM CHISODIENNUOC CS
 INNER JOIN DICHVU DV ON CS.MaDichVu = DV.MaDichVu
 WHERE CS.MaPhong = @MaPhong
-    AND CS.MaDichVu = @MaDichVuDien
-    AND CS.Thang = 7
+    AND CS.MaDichVu = @MaDichVu
+    AND CS.Thang = 6
     AND CS.Nam = 2026
 ORDER BY CS.MaChiSo DESC;

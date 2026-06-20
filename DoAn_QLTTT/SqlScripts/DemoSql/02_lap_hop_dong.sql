@@ -1,22 +1,13 @@
-DECLARE @MaPhong INT;
-DECLARE @MaKhachDaiDien INT;
+DECLARE @MaPhong INT = 0;
+DECLARE @MaKhachDaiDien INT = 0;
 DECLARE @MaHopDongMoi INT;
-
-SELECT TOP 1 @MaPhong = MaPhong
-FROM PHONGTRO
-WHERE TrangThai = N'Trống'
-ORDER BY MaPhong;
-
-SELECT @MaKhachDaiDien = MaKhach
-FROM KHACHTHUE
-WHERE CCCD = '079199999999';
 
 EXEC dbo.SP_LAP_HOPDONG
     @MaPhong = @MaPhong,
     @MaKhachDaiDien = @MaKhachDaiDien,
-    @NgayBatDau = '2026-06-18',
-    @NgayKetThuc = '2027-06-18',
-    @TienCoc = 3000000,
+    @NgayBatDau = '2026-06-20',
+    @NgayKetThuc = '2027-06-20',
+    @TienCoc = 0,
     @MaHopDongMoi = @MaHopDongMoi OUTPUT;
 
 SELECT
