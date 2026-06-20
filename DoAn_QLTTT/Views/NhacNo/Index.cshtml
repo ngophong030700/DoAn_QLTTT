@@ -34,12 +34,21 @@
             {
                 <tr>
                     <td class="monospace-data">#@item.MaHoaDon</td>
-                    <td>@item.HopDongMoTa</td>
-                    <td>@item.KhachDaiDienHoTen</td>
+                    <td>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary">HĐ #@item.MaHopDong</span>
+                        <div class="small text-secondary mt-1"><i class="bi bi-door-open me-1"></i>Phòng @(item.SoPhong ?? "—")</div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-dark">@(item.KhachDaiDienHoTen ?? "Chưa có thông tin")</div>
+                    </td>
                     <td>@item.Thang/@item.Nam</td>
                     <td class="monospace-data">@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
                     <td class="text-end fw-semibold monospace-data">@FormatHelper.Money(item.ConLai)</td>
-                    <td><span class="badge @BadgeHelper.HoaDonStatusClass(item.TrangThai)">@item.TrangThai</span></td>
+                    <td>
+                        <span class="badge rounded-pill px-3 py-2 @BadgeHelper.HoaDonStatusClass(item.TrangThai)">
+                            @BadgeHelper.HoaDonStatusText(item.TrangThai)
+                        </span>
+                    </td>
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-controller="HoaDon" asp-action="Details" asp-route-id="@item.MaHoaDon">Xem hóa đơn</a>
                     </td>

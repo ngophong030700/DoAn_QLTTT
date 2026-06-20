@@ -50,6 +50,20 @@ public class NguoiDungDapperRepository : DapperCrudRepository<NguoiDung>, INguoi
 
 public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepository
 {
+    private const string HoaDonSelect = """
+        SELECT
+            HD.*,
+            P.SoPhong,
+            KT.HoTen AS KhachDaiDienHoTen,
+            ND.HoTen AS NguoiLapHoTen,
+            CONCAT(N'HĐ #', HD.MaHopDong, N' - Phòng ', COALESCE(P.SoPhong, N'—')) AS HopDongMoTa
+        FROM HOADON HD
+        LEFT JOIN HOPDONG HDG ON HDG.MaHopDong = HD.MaHopDong
+        LEFT JOIN PHONGTRO P ON P.MaPhong = HDG.MaPhong
+        LEFT JOIN KHACHTHUE KT ON KT.MaKhach = HDG.MaKhachDaiDien
+        LEFT JOIN NGUOIDUNG ND ON ND.MaNguoiDung = HD.MaNguoiLap
+        """;
+
     private readonly DapperContext _context;
 
     public HoaDonDapperRepository(DapperContext context)
@@ -58,12 +72,40 @@ public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepos
         _context = context;
     }
 
+    public override async Task<IReadOnlyList<HoaDon>> GetAllAsync(string? keyword = null)
+    {
+        using var connection = _context.CreateConnection();
+        var sql = HoaDonSelect + """
+
+            WHERE @Keyword IS NULL
+               OR CAST(HD.MaHoaDon AS varchar(20)) LIKE '%' + @Keyword + '%'
+               OR CAST(HD.MaHopDong AS varchar(20)) LIKE '%' + @Keyword + '%'
+               OR P.SoPhong LIKE '%' + @Keyword + '%'
+               OR KT.HoTen LIKE N'%' + @Keyword + N'%'
+               OR HD.TrangThai LIKE N'%' + @Keyword + N'%'
+            ORDER BY HD.Nam DESC, HD.Thang DESC, HD.MaHoaDon DESC;
+            """;
+
+        var result = await connection.QueryAsync<HoaDon>(
+            sql,
+            new { Keyword = string.IsNullOrWhiteSpace(keyword) ? null : keyword.Trim() });
+        return result.ToList();
+    }
+
+    public override async Task<HoaDon?> GetByIdAsync(int id)
+    {
+        using var connection = _context.CreateConnection();
+        return await connection.QueryFirstOrDefaultAsync<HoaDon>(
+            HoaDonSelect + "\nWHERE HD.MaHoaDon = @Id;",
+            new { Id = id });
+    }
+
     public async Task<IReadOnlyList<HoaDon>> GetRecentAsync(int take)
     {
         using var connection = _context.CreateConnection();
-        // TODO: Thay bằng sp_HoaDon_GetRecent nếu cần join đầy đủ tên phòng/khách/người lập.
         var result = await connection.QueryAsync<HoaDon>(
-            "SELECT TOP (@Take) * FROM HoaDon ORDER BY Nam DESC, Thang DESC, MaHoaDon DESC",
+            HoaDonSelect.Replace("SELECT", "SELECT TOP (@Take)", StringComparison.Ordinal)
+                + "\nORDER BY HD.Nam DESC, HD.Thang DESC, HD.MaHoaDon DESC;",
             new { Take = take });
         return result.ToList();
     }
@@ -71,9 +113,13 @@ public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepos
     public async Task<IReadOnlyList<HoaDon>> GetOverdueAsync()
     {
         using var connection = _context.CreateConnection();
-        // TODO: Có thể thay bằng stored procedure/view danh sách nhắc nợ chính thức.
         var result = await connection.QueryAsync<HoaDon>(
-            "SELECT * FROM HoaDon WHERE ConLai > 0 AND HanThanhToan < CAST(GETDATE() AS date)");
+            HoaDonSelect + """
+
+            WHERE HD.ConLai > 0
+              AND HD.HanThanhToan < CAST(GETDATE() AS date)
+            ORDER BY HD.HanThanhToan, HD.MaHoaDon;
+            """);
         return result.ToList();
     }
 
