@@ -27,6 +27,7 @@ public static class BadgeHelper
         "Chưa thanh toán" => "bg-warning text-dark",
         "ChuaThanhToan" => "bg-warning text-dark",
         AppStatuses.HoaDon.MotPhan => "bg-info text-dark",
+        "Mot phan" => "bg-info text-dark",
         "Thanh toán một phần" => "bg-info text-dark",
         "MotPhan" => "bg-info text-dark",
         AppStatuses.HoaDon.DaThanhToan => "bg-success text-white",
@@ -40,7 +41,7 @@ public static class BadgeHelper
     public static string HoaDonStatusText(string? status) => status?.Trim() switch
     {
         AppStatuses.HoaDon.ChuaThanhToan or "Chưa thanh toán" or "ChuaThanhToan" => "Chưa thanh toán",
-        AppStatuses.HoaDon.MotPhan or "Thanh toán một phần" or "MotPhan" => "Thanh toán một phần",
+        AppStatuses.HoaDon.MotPhan or "Mot phan" or "Thanh toán một phần" or "MotPhan" => "Thanh toán một phần",
         AppStatuses.HoaDon.DaThanhToan or "Đã thanh toán" or "DaThanhToan" => "Đã thanh toán",
         AppStatuses.HoaDon.QuaHan or "QuaHan" => "Quá hạn",
         null or "" => "Chưa xác định",

@@ -1,3 +1,4 @@
+using DoAn_QLTTT.Helpers;
 using DoAn_QLTTT.Models;
 using DoAn_QLTTT.Repositories;
 using DoAn_QLTTT.ViewModels;
@@ -124,8 +125,24 @@ public class HoaDonController : AdminControllerBase
             .Select(x => new SelectListItem($"HĐ #{x.MaHopDong} - Phòng {x.SoPhong} - {x.KhachDaiDienHoTen}", x.MaHopDong.ToString(), x.MaHopDong == model.MaHopDong));
         model.NguoiDungOptions = (await _nguoiDungRepository.GetAllAsync())
             .Select(x => new SelectListItem(x.HoTen, x.MaNguoiDung.ToString(), x.MaNguoiDung == model.MaNguoiLap));
-        model.TrangThaiOptions = AppStatuses.HoaDon.All.Select(x => new SelectListItem(x, x, x == model.TrangThai));
+        model.TrangThaiOptions = AppStatuses.HoaDon.All.Select(x => new SelectListItem(
+            x == AppStatuses.HoaDon.MotPhan ? "Thanh toán một phần" : BadgeHelper.HoaDonStatusText(x),
+            x,
+            IsSameInvoiceStatus(x, model.TrangThai)));
         return model;
+    }
+
+    private static bool IsSameInvoiceStatus(string expected, string? current)
+    {
+        var normalized = BadgeHelper.HoaDonStatusText(current);
+        return expected switch
+        {
+            AppStatuses.HoaDon.ChuaThanhToan => normalized == "Chưa thanh toán",
+            AppStatuses.HoaDon.MotPhan => normalized == "Thanh toán một phần",
+            AppStatuses.HoaDon.DaThanhToan => normalized == "Đã thanh toán",
+            AppStatuses.HoaDon.QuaHan => normalized == "Quá hạn",
+            _ => false
+        };
     }
 
     private static HoaDon ToEntity(HoaDonFormViewModel model) => new()
