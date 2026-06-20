@@ -1,6 +1,5 @@
 using DoAn_QLTTT.Models;
 using DoAn_QLTTT.Repositories;
-using DoAn_QLTTT.Services;
 using DoAn_QLTTT.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,20 +12,17 @@ public class HoaDonController : AdminControllerBase
     private readonly IHopDongRepository _hopDongRepository;
     private readonly INguoiDungRepository _nguoiDungRepository;
     private readonly IThanhToanRepository _thanhToanRepository;
-    private readonly IHoaDonService _hoaDonService;
 
     public HoaDonController(
         IHoaDonRepository repository,
         IHopDongRepository hopDongRepository,
         INguoiDungRepository nguoiDungRepository,
-        IThanhToanRepository thanhToanRepository,
-        IHoaDonService hoaDonService)
+        IThanhToanRepository thanhToanRepository)
     {
         _repository = repository;
         _hopDongRepository = hopDongRepository;
         _nguoiDungRepository = nguoiDungRepository;
         _thanhToanRepository = thanhToanRepository;
-        _hoaDonService = hoaDonService;
     }
 
     public async Task<IActionResult> Index(string? keyword)
@@ -120,21 +116,6 @@ public class HoaDonController : AdminControllerBase
     {
         await _repository.DeleteAsync(id);
         return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> LapHoaDonDemo()
-    {
-        var maHoaDon = await _hoaDonService.LapHoaDonDemoAsync();
-        if (maHoaDon == 0)
-        {
-            TempData["ErrorMessage"] = "Chưa có hợp đồng hiệu lực để lập hóa đơn demo.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        TempData["SuccessMessage"] = "Đã lập hóa đơn demo từ hợp đồng đầu tiên đang hiệu lực.";
-        return RedirectToAction(nameof(Details), new { id = maHoaDon });
     }
 
     private async Task<HoaDonFormViewModel> BuildFormAsync(HoaDonFormViewModel model)

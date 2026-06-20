@@ -8,12 +8,7 @@
         <input class="form-control me-2" type="search" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm hợp đồng, phòng, khách, trạng thái" />
         <button class="btn btn-outline-secondary" type="submit">Tìm</button>
     </form>
-    <div class="d-flex gap-2">
-        <form asp-action="LapHoaDonDemo" method="post">
-            <button class="btn btn-outline-primary" type="submit">Lập hóa đơn demo</button>
-        </form>
-        <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
-    </div>
+    <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
 </div>
 
 <div class="table-card table-responsive">

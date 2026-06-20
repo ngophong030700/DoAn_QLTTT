@@ -9,7 +9,9 @@
             <h2 class="h5 mb-2">Hóa đơn #@Model.HoaDon.MaHoaDon</h2>
             <div class="text-muted">@Model.HoaDon.HopDongMoTa - @Model.HoaDon.KhachDaiDienHoTen</div>
         </div>
-        <span class="badge @BadgeHelper.HoaDonStatusClass(Model.HoaDon.TrangThai)">@Model.HoaDon.TrangThai</span>
+        <span class="badge rounded-pill px-3 py-2 @BadgeHelper.HoaDonStatusClass(Model.HoaDon.TrangThai)">
+            @BadgeHelper.HoaDonStatusText(Model.HoaDon.TrangThai)
+        </span>
     </div>
     <hr />
     <div class="row g-3">
@@ -90,7 +92,11 @@
                             <tr>
                                 <td>@item.NgayThu.ToString("dd/MM/yyyy")</td>
                                 <td>@FormatHelper.Money(item.SoTien)</td>
-                                <td>@item.HinhThuc</td>
+                                <td>
+                                    <span class="badge @BadgeHelper.HinhThucThanhToanClass(item.HinhThuc)">
+                                        @BadgeHelper.HinhThucThanhToanText(item.HinhThuc)
+                                    </span>
+                                </td>
                                 <td>@item.NguoiThuHoTen</td>
                             </tr>
                         }

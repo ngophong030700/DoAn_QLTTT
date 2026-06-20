@@ -266,25 +266,9 @@
                                     <td class="text-end text-danger fw-700">@FormatHelper.Money(item.ConLai)</td>
                                     <td class="text-secondary small"><i class="bi bi-calendar3 text-muted me-1"></i>@item.HanThanhToan.ToString("dd/MM/yyyy")</td>
                                     <td class="text-center">
-                                        @{
-                                            var statusClass = item.TrangThai switch
-                                            {
-                                                "DaThanhToan" => "bg-success-subtle text-success border-success-subtle",
-                                                "ChuaThanhToan" => "bg-warning-subtle text-warning border-warning-subtle",
-                                                "QuaHan" => "bg-danger-subtle text-danger border-danger-subtle",
-                                                "MotPhan" => "bg-info-subtle text-info border-info-subtle",
-                                                _ => "bg-secondary-subtle text-secondary"
-                                            };
-                                            var statusText = item.TrangThai switch
-                                            {
-                                                "DaThanhToan" => "Đã thanh toán",
-                                                "ChuaThanhToan" => "Chưa thanh toán",
-                                                "QuaHan" => "Quá hạn",
-                                                "MotPhan" => "Thanh toán 1 phần",
-                                                _ => item.TrangThai
-                                            };
-                                        }
-                                        <span class="badge border px-2.5 py-1 rounded-pill @statusClass">@statusText</span>
+                                        <span class="badge px-2.5 py-1 rounded-pill @BadgeHelper.HoaDonStatusClass(item.TrangThai)">
+                                            @BadgeHelper.HoaDonStatusText(item.TrangThai)
+                                        </span>
                                     </td>
                                 </tr>
                             }

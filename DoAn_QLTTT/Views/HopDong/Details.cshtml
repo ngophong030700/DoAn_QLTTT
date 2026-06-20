@@ -18,7 +18,11 @@
         <dt class="col-sm-3">Tiền cọc</dt>
         <dd class="col-sm-9">@FormatHelper.Money(Model.TienCoc)</dd>
         <dt class="col-sm-3">Trạng thái</dt>
-        <dd class="col-sm-9"><span class="badge @BadgeHelper.HopDongStatusClass(Model.TrangThai)">@Model.TrangThai</span></dd>
+        <dd class="col-sm-9">
+            <span class="badge rounded-pill px-3 py-2 @BadgeHelper.HopDongStatusClass(Model.TrangThai)">
+                @BadgeHelper.HopDongStatusText(Model.TrangThai)
+            </span>
+        </dd>
     </dl>
     <div class="mt-4 d-flex gap-2">
         <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaHopDong">Sửa</a>

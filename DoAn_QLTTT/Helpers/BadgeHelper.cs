@@ -4,12 +4,21 @@ namespace DoAn_QLTTT.Helpers;
 
 public static class BadgeHelper
 {
-    public static string PhongStatusClass(string? status) => status switch
+    public static string PhongStatusClass(string? status) => status?.Trim() switch
     {
-        AppStatuses.Phong.Trong => "text-bg-success",
-        AppStatuses.Phong.DangThue => "text-bg-primary",
-        AppStatuses.Phong.BaoTri => "text-bg-warning",
-        _ => "text-bg-secondary"
+        AppStatuses.Phong.Trong or "Trong" => "bg-success text-white",
+        AppStatuses.Phong.DangThue or "Dang thue" or "DangThue" => "bg-primary text-white",
+        AppStatuses.Phong.BaoTri or "Bao tri" or "BaoTri" => "bg-warning text-dark",
+        _ => "bg-secondary text-white"
+    };
+
+    public static string PhongStatusText(string? status) => status?.Trim() switch
+    {
+        AppStatuses.Phong.Trong or "Trong" => "Trống",
+        AppStatuses.Phong.DangThue or "Dang thue" or "DangThue" => "Đang thuê",
+        AppStatuses.Phong.BaoTri or "Bao tri" or "BaoTri" => "Bảo trì",
+        null or "" => "Chưa xác định",
+        _ => status!
     };
 
     public static string HoaDonStatusClass(string? status) => status?.Trim() switch
@@ -45,11 +54,35 @@ public static class BadgeHelper
         _ => "text-bg-light text-dark"
     };
 
-    public static string HopDongStatusClass(string? status) => status switch
+    public static string HopDongStatusClass(string? status) => status?.Trim() switch
     {
-        AppStatuses.HopDong.HieuLuc => "text-bg-success",
-        AppStatuses.HopDong.SapHetHan => "text-bg-warning",
-        AppStatuses.HopDong.KetThuc => "text-bg-secondary",
-        _ => "text-bg-light text-dark"
+        AppStatuses.HopDong.HieuLuc or "Hieu luc" or "HieuLuc" => "bg-success text-white",
+        AppStatuses.HopDong.SapHetHan or "Sap het han" or "SapHetHan" => "bg-warning text-dark",
+        AppStatuses.HopDong.KetThuc or "Ket thuc" or "KetThuc" or "Đã kết thúc" => "bg-secondary text-white",
+        _ => "bg-dark text-white"
+    };
+
+    public static string HopDongStatusText(string? status) => status?.Trim() switch
+    {
+        AppStatuses.HopDong.HieuLuc or "Hieu luc" or "HieuLuc" => "Hiệu lực",
+        AppStatuses.HopDong.SapHetHan or "Sap het han" or "SapHetHan" => "Sắp hết hạn",
+        AppStatuses.HopDong.KetThuc or "Ket thuc" or "KetThuc" or "Đã kết thúc" => "Kết thúc",
+        null or "" => "Chưa xác định",
+        _ => status!
+    };
+
+    public static string HinhThucThanhToanClass(string? method) => method?.Trim() switch
+    {
+        "TienMat" or "Tiền mặt" => "bg-success text-white",
+        "ChuyenKhoan" or "Chuyển khoản" => "bg-info text-dark",
+        _ => "bg-secondary text-white"
+    };
+
+    public static string HinhThucThanhToanText(string? method) => method?.Trim() switch
+    {
+        "TienMat" or "Tiền mặt" => "Tiền mặt",
+        "ChuyenKhoan" or "Chuyển khoản" => "Chuyển khoản",
+        null or "" => "Chưa xác định",
+        _ => method!
     };
 }

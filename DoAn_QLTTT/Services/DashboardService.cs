@@ -41,17 +41,23 @@ public class DashboardService : IDashboardService
         return new DashboardViewModel
         {
             TongSoPhong = rooms.Count,
-            PhongTrong = rooms.Count(x => x.TrangThai == AppStatuses.Phong.Trong),
-            PhongDangThue = rooms.Count(x => x.TrangThai == AppStatuses.Phong.DangThue),
-            PhongBaoTri = rooms.Count(x => x.TrangThai == AppStatuses.Phong.BaoTri),
+            PhongTrong = rooms.Count(x => IsRoomStatus(x.TrangThai, AppStatuses.Phong.Trong, "Trong")),
+            PhongDangThue = rooms.Count(x => IsRoomStatus(x.TrangThai, AppStatuses.Phong.DangThue, "Dang thue", "DangThue")),
+            PhongBaoTri = rooms.Count(x => IsRoomStatus(x.TrangThai, AppStatuses.Phong.BaoTri, "Bao tri", "BaoTri")),
             HoaDonChuaThanhToan = invoices.Count(x => x.ConLai > 0),
             HoaDonQuaHan = invoices.Count(x => x.ConLai > 0 && x.HanThanhToan < today),
             DoanhThuThang = payments.Where(x => x.NgayThu.Month == DateTime.Today.Month && x.NgayThu.Year == DateTime.Today.Year).Sum(x => x.SoTien),
             TongCongNo = invoices.Sum(x => x.ConLai),
             HoaDonGanDay = await _hoaDonRepository.GetRecentAsync(6),
-            PhongDangThueList = rooms.Where(x => x.TrangThai == AppStatuses.Phong.DangThue).Take(6).ToList(),
+            PhongDangThueList = rooms
+                .Where(x => IsRoomStatus(x.TrangThai, AppStatuses.Phong.DangThue, "Dang thue", "DangThue"))
+                .Take(6)
+                .ToList(),
             MonthlyRevenueLabels = monthlyRevenueLabels,
             MonthlyRevenueValues = monthlyRevenueValues
         };
     }
+
+    private static bool IsRoomStatus(string? current, params string[] accepted) =>
+        accepted.Any(x => string.Equals(current?.Trim(), x, StringComparison.OrdinalIgnoreCase));
 }

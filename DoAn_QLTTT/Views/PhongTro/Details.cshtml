@@ -14,9 +14,13 @@
         <dt class="col-sm-3">Sức chứa</dt>
         <dd class="col-sm-9">@Model.SucChuaToiDa</dd>
         <dt class="col-sm-3">Trạng thái</dt>
-        <dd class="col-sm-9"><span class="badge @BadgeHelper.PhongStatusClass(Model.TrangThai)">@Model.TrangThai</span></dd>
+        <dd class="col-sm-9">
+            <span class="badge rounded-pill px-3 py-2 @BadgeHelper.PhongStatusClass(Model.TrangThai)">
+                @BadgeHelper.PhongStatusText(Model.TrangThai)
+            </span>
+        </dd>
         <dt class="col-sm-3">Ghi chú</dt>
-        <dd class="col-sm-9">@Model.GhiChu</dd>
+        <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.GhiChu) ? "—" : Model.GhiChu)</dd>
     </dl>
     <div class="mt-4 d-flex gap-2">
         <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaPhong">Sửa</a>

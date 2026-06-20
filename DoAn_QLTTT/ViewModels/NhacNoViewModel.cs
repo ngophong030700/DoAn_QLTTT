@@ -5,5 +5,4 @@ namespace DoAn_QLTTT.ViewModels;
 public class NhacNoViewModel
 {
     public IReadOnlyList<HoaDon> HoaDonQuaHans { get; set; } = [];
-    public int? SoHoaDonDaQuet { get; set; }
 }

@@ -3,18 +3,6 @@
     ViewData["Title"] = "Nhắc nợ";
 }
 
-<div class="page-actions">
-    <div>
-        @if (Model.SoHoaDonDaQuet.HasValue)
-        {
-            <span class="badge text-bg-info">Đã quét @Model.SoHoaDonDaQuet.Value hóa đơn quá hạn</span>
-        }
-    </div>
-    <form asp-action="QuetQuaHan" method="post">
-        <button class="btn btn-primary" type="submit">Quét hóa đơn quá hạn</button>
-    </form>
-</div>
-
 <div class="table-card table-responsive">
     <table class="table align-middle">
         <thead>

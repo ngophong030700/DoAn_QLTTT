@@ -32,7 +32,6 @@ public interface IHoaDonRepository : ICrudRepository<HoaDon, int>
     Task<IReadOnlyList<HoaDon>> GetOverdueAsync();
     Task<IReadOnlyList<ChiTietHoaDon>> GetChiTietAsync(int maHoaDon);
     Task<int> AddChiTietAsync(ChiTietHoaDon chiTiet);
-    Task<int> ScanOverdueAsync();
 }
 
 public interface IThanhToanRepository : ICrudRepository<ThanhToan, int>

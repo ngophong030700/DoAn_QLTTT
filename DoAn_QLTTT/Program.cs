@@ -39,8 +39,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddScoped<DapperContext>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddScoped<IHoaDonService, HoaDonService>();
-builder.Services.AddScoped<INhacNoService, NhacNoService>();
 builder.Services.AddScoped<ISqlScriptReader, SqlScriptReader>();
 
 // Register SQL Server/Dapper repositories unconditionally
