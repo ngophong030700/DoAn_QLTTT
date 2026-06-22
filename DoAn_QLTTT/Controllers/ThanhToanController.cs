@@ -53,7 +53,6 @@ public class ThanhToanController : AdminControllerBase
         }
 
         await _repository.AddAsync(ToEntity(model));
-        // TODO: sp_ThanhToan_Insert sẽ thêm thanh toán; trigger DB cập nhật DaThanhToan, ConLai, TrangThai hóa đơn.
         return RedirectToAction("Details", "HoaDon", new { id = model.MaHoaDon });
     }
 

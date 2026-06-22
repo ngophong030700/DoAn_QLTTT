@@ -21,7 +21,10 @@
     </div>
     <div class="col-md-6">
         <label asp-for="LoaiTinhPhi" class="form-label"></label>
-        <input asp-for="LoaiTinhPhi" class="form-control" placeholder="Theo chỉ số hoặc Cố định" />
+        <select asp-for="LoaiTinhPhi" class="form-select">
+            <option value="TheoChiSo">Theo chỉ số</option>
+            <option value="CoDinh">Cố định</option>
+        </select>
         <span asp-validation-for="LoaiTinhPhi" class="text-danger"></span>
     </div>
 </div>

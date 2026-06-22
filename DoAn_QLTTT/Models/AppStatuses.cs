@@ -25,9 +25,9 @@ public static class AppStatuses
     {
         public const string HieuLuc = "Hiệu lực";
         public const string SapHetHan = "Sắp hết hạn";
-        public const string KetThuc = "Kết thúc";
+        public const string KetThuc = "Đã kết thúc";
 
-        public static readonly string[] All = [HieuLuc, SapHetHan, KetThuc];
+        public static readonly string[] All = [HieuLuc, KetThuc];
     }
 
     public static class VaiTro

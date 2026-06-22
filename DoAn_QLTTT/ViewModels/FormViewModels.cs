@@ -233,7 +233,7 @@ public class ThanhToanFormViewModel
     [Required]
     [StringLength(50)]
     [Display(Name = "Hình thức")]
-    public string HinhThuc { get; set; } = "Tiền mặt";
+    public string HinhThuc { get; set; } = "TienMat";
 
     public IEnumerable<SelectListItem> HoaDonOptions { get; set; } = [];
     public IEnumerable<SelectListItem> NguoiDungOptions { get; set; } = [];

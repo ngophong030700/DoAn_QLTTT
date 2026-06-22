@@ -28,7 +28,10 @@
     </div>
     <div class="col-md-4">
         <label asp-for="HinhThuc" class="form-label"></label>
-        <input asp-for="HinhThuc" class="form-control" placeholder="Tiền mặt, chuyển khoản" />
+        <select asp-for="HinhThuc" class="form-select">
+            <option value="TienMat">Tiền mặt</option>
+            <option value="ChuyenKhoan">Chuyển khoản</option>
+        </select>
         <span asp-validation-for="HinhThuc" class="text-danger"></span>
     </div>
 </div>

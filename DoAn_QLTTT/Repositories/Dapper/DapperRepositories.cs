@@ -1,4 +1,3 @@
-using System.Data;
 using Dapper;
 using DoAn_QLTTT.Data;
 using DoAn_QLTTT.Models;
@@ -6,7 +5,10 @@ using DoAn_QLTTT.Models;
 namespace DoAn_QLTTT.Repositories.Dapper;
 
 public class LoaiPhongDapperRepository(DapperContext context)
-    : DapperCrudRepository<LoaiPhong>(context, "LoaiPhong", "MaLoaiPhong", "sp_LoaiPhong_Insert", "sp_LoaiPhong_Update", "sp_LoaiPhong_Delete"), ILoaiPhongRepository;
+    : DapperCrudRepository<LoaiPhong>(
+        context, "LoaiPhong", "MaLoaiPhong",
+        ["TenLoai", "DienTich", "GiaThueCoSo", "SucChuaToiDa"],
+        ["MaLoaiPhong", "TenLoai", "DienTich", "GiaThueCoSo", "SucChuaToiDa"]), ILoaiPhongRepository;
 
 public class PhongTroDapperRepository : DapperCrudRepository<PhongTro>, IPhongTroRepository
 {
@@ -19,7 +21,10 @@ public class PhongTroDapperRepository : DapperCrudRepository<PhongTro>, IPhongTr
     private readonly DapperContext _context;
 
     public PhongTroDapperRepository(DapperContext context)
-        : base(context, "PhongTro", "MaPhong", "sp_PhongTro_Insert", "sp_PhongTro_Update", "sp_PhongTro_Delete")
+        : base(
+            context, "PhongTro", "MaPhong",
+            ["MaLoaiPhong", "SoPhong", "GiaThue", "SucChuaToiDa", "TrangThai", "GhiChu"],
+            ["MaPhong", "MaLoaiPhong", "SoPhong", "GiaThue", "SucChuaToiDa", "TrangThai", "GhiChu"])
     {
         _context = context;
     }
@@ -53,7 +58,10 @@ public class PhongTroDapperRepository : DapperCrudRepository<PhongTro>, IPhongTr
 }
 
 public class KhachThueDapperRepository(DapperContext context)
-    : DapperCrudRepository<KhachThue>(context, "KhachThue", "MaKhach", "sp_KhachThue_Insert", "sp_KhachThue_Update", "sp_KhachThue_Delete"), IKhachThueRepository;
+    : DapperCrudRepository<KhachThue>(
+        context, "KhachThue", "MaKhach",
+        ["HoTen", "CCCD", "SoDienThoai", "DiaChi"],
+        ["MaKhach", "HoTen", "CCCD", "SoDienThoai", "DiaChi"]), IKhachThueRepository;
 
 public class HopDongDapperRepository : DapperCrudRepository<HopDong>, IHopDongRepository
 {
@@ -70,7 +78,10 @@ public class HopDongDapperRepository : DapperCrudRepository<HopDong>, IHopDongRe
     private readonly DapperContext _context;
 
     public HopDongDapperRepository(DapperContext context)
-        : base(context, "HopDong", "MaHopDong", "sp_HopDong_Insert", "sp_HopDong_Update", "sp_HopDong_Delete")
+        : base(
+            context, "HopDong", "MaHopDong",
+            ["MaPhong", "MaKhachDaiDien", "NgayBatDau", "NgayKetThuc", "TienThueThang", "TienCoc", "TrangThai"],
+            ["MaHopDong", "MaPhong", "MaKhachDaiDien", "NgayBatDau", "NgayKetThuc", "TienThueThang", "TienCoc", "TrangThai"])
     {
         _context = context;
     }
@@ -105,7 +116,10 @@ public class HopDongDapperRepository : DapperCrudRepository<HopDong>, IHopDongRe
 }
 
 public class DichVuDapperRepository(DapperContext context)
-    : DapperCrudRepository<DichVu>(context, "DichVu", "MaDichVu", "sp_DichVu_Insert", "sp_DichVu_Update", "sp_DichVu_Delete"), IDichVuRepository;
+    : DapperCrudRepository<DichVu>(
+        context, "DichVu", "MaDichVu",
+        ["TenDichVu", "DonVi", "DonGia", "LoaiTinhPhi"],
+        ["MaDichVu", "TenDichVu", "DonVi", "DonGia", "LoaiTinhPhi"]), IDichVuRepository;
 
 public class ChiSoDienNuocDapperRepository : DapperCrudRepository<ChiSoDienNuoc>, IChiSoDienNuocRepository
 {
@@ -124,7 +138,10 @@ public class ChiSoDienNuocDapperRepository : DapperCrudRepository<ChiSoDienNuoc>
     private readonly DapperContext _context;
 
     public ChiSoDienNuocDapperRepository(DapperContext context)
-        : base(context, "ChiSoDienNuoc", "MaChiSo", "sp_ChiSoDienNuoc_Insert", "sp_ChiSoDienNuoc_Update", "sp_ChiSoDienNuoc_Delete")
+        : base(
+            context, "ChiSoDienNuoc", "MaChiSo",
+            ["MaPhong", "MaDichVu", "MaNguoiNhap", "Thang", "Nam", "ChiSoCu", "ChiSoMoi", "TieuThu"],
+            ["MaChiSo", "MaPhong", "MaDichVu", "MaNguoiNhap", "Thang", "Nam", "ChiSoCu", "ChiSoMoi", "TieuThu"])
     {
         _context = context;
     }
@@ -163,7 +180,10 @@ public class NguoiDungDapperRepository : DapperCrudRepository<NguoiDung>, INguoi
     private readonly DapperContext _context;
 
     public NguoiDungDapperRepository(DapperContext context)
-        : base(context, "NguoiDung", "MaNguoiDung", "sp_NguoiDung_Insert", "sp_NguoiDung_Update", "sp_NguoiDung_Delete")
+        : base(
+            context, "NguoiDung", "MaNguoiDung",
+            ["TenDangNhap", "MatKhau", "HoTen", "VaiTro", "DangHoatDong"],
+            ["MaNguoiDung", "TenDangNhap", "MatKhau", "HoTen", "VaiTro", "DangHoatDong"])
     {
         _context = context;
     }
@@ -202,7 +222,10 @@ public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepos
     private readonly DapperContext _context;
 
     public HoaDonDapperRepository(DapperContext context)
-        : base(context, "HoaDon", "MaHoaDon", "sp_HoaDon_Insert", "sp_HoaDon_Update", "sp_HoaDon_Delete")
+        : base(
+            context, "HoaDon", "MaHoaDon",
+            ["MaHopDong", "MaNguoiLap", "Thang", "Nam", "TongTien", "DaThanhToan", "ConLai", "HanThanhToan", "TrangThai"],
+            ["MaHoaDon", "MaHopDong", "MaNguoiLap", "Thang", "Nam", "TongTien", "DaThanhToan", "ConLai", "HanThanhToan", "TrangThai"])
     {
         _context = context;
     }
@@ -284,8 +307,14 @@ public class HoaDonDapperRepository : DapperCrudRepository<HoaDon>, IHoaDonRepos
     public async Task<int> AddChiTietAsync(ChiTietHoaDon chiTiet)
     {
         using var connection = _context.CreateConnection();
-        // TODO: sp_ChiTietHoaDon_Insert sẽ thêm dòng chi tiết; trigger DB tự tính lại TongTien hóa đơn.
-        return await connection.ExecuteAsync("sp_ChiTietHoaDon_Insert", chiTiet, commandType: CommandType.StoredProcedure);
+        return await connection.ExecuteAsync(
+            """
+            INSERT INTO CHITIETHOADON
+                (MaHoaDon, MaDichVu, MoTa, SoLuong, DonGiaTaiThoiDiem, ThanhTien)
+            VALUES
+                (@MaHoaDon, @MaDichVu, @MoTa, @SoLuong, @DonGiaTaiThoiDiem, @ThanhTien);
+            """,
+            chiTiet);
     }
 
 }
@@ -307,7 +336,10 @@ public class ThanhToanDapperRepository : DapperCrudRepository<ThanhToan>, IThanh
     private readonly DapperContext _context;
 
     public ThanhToanDapperRepository(DapperContext context)
-        : base(context, "ThanhToan", "MaThanhToan", "sp_ThanhToan_Insert", "sp_ThanhToan_Update", "sp_ThanhToan_Delete")
+        : base(
+            context, "ThanhToan", "MaThanhToan",
+            ["MaHoaDon", "MaNguoiThu", "SoTien", "NgayThu", "HinhThuc"],
+            ["MaThanhToan", "MaHoaDon", "MaNguoiThu", "SoTien", "NgayThu", "HinhThuc"])
     {
         _context = context;
     }
@@ -347,10 +379,4 @@ public class ThanhToanDapperRepository : DapperCrudRepository<ThanhToan>, IThanh
         return result.ToList();
     }
 
-    public override async Task<int> AddAsync(ThanhToan entity)
-    {
-        using var connection = _context.CreateConnection();
-        // TODO: sp_ThanhToan_Insert ghi nhận thanh toán; trigger DB cập nhật DaThanhToan, ConLai, TrangThai của HoaDon.
-        return await connection.ExecuteAsync("sp_ThanhToan_Insert", entity, commandType: CommandType.StoredProcedure);
-    }
 }

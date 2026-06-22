@@ -1,4 +1,3 @@
-using System.Data;
 using Dapper;
 using DoAn_QLTTT.Data;
 
@@ -9,24 +8,21 @@ public abstract class DapperCrudRepository<TEntity> : ICrudRepository<TEntity, i
     private readonly DapperContext _context;
     private readonly string _tableName;
     private readonly string _keyColumn;
-    private readonly string _insertProcedure;
-    private readonly string _updateProcedure;
-    private readonly string _deleteProcedure;
+    private readonly string[] _insertParameters;
+    private readonly string[] _updateParameters;
 
     protected DapperCrudRepository(
         DapperContext context,
         string tableName,
         string keyColumn,
-        string insertProcedure,
-        string updateProcedure,
-        string deleteProcedure)
+        string[] insertParameters,
+        string[] updateParameters)
     {
         _context = context;
         _tableName = tableName;
         _keyColumn = keyColumn;
-        _insertProcedure = insertProcedure;
-        _updateProcedure = updateProcedure;
-        _deleteProcedure = deleteProcedure;
+        _insertParameters = insertParameters;
+        _updateParameters = updateParameters;
     }
 
     public virtual async Task<IReadOnlyList<TEntity>> GetAllAsync(string? keyword = null)
@@ -49,23 +45,58 @@ public abstract class DapperCrudRepository<TEntity> : ICrudRepository<TEntity, i
     public virtual async Task<int> AddAsync(TEntity entity)
     {
         using var connection = _context.CreateConnection();
-        // TODO: Đổi tên stored procedure nếu database dùng tên khác.
-        return await connection.ExecuteAsync(_insertProcedure, entity, commandType: CommandType.StoredProcedure);
+        var columns = string.Join(", ", _insertParameters.Select(EscapeIdentifier));
+        var values = string.Join(", ", _insertParameters.Select(name => $"@{name}"));
+        var sql = $"INSERT INTO {EscapeIdentifier(_tableName)} ({columns}) VALUES ({values});";
+
+        return await connection.ExecuteAsync(
+            sql,
+            BuildParameters(entity, _insertParameters));
     }
 
     public virtual async Task<int> UpdateAsync(TEntity entity)
     {
         using var connection = _context.CreateConnection();
-        // TODO: Đổi tên stored procedure nếu database dùng tên khác.
-        return await connection.ExecuteAsync(_updateProcedure, entity, commandType: CommandType.StoredProcedure);
+        var updateColumns = _updateParameters
+            .Where(name => !name.Equals(_keyColumn, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        var assignments = string.Join(
+            ", ",
+            updateColumns.Select(name => $"{EscapeIdentifier(name)} = @{name}"));
+        var sql =
+            $"UPDATE {EscapeIdentifier(_tableName)} SET {assignments} " +
+            $"WHERE {EscapeIdentifier(_keyColumn)} = @{_keyColumn};";
+
+        return await connection.ExecuteAsync(
+            sql,
+            BuildParameters(entity, _updateParameters));
     }
 
     public virtual async Task<int> DeleteAsync(int id)
     {
         using var connection = _context.CreateConnection();
-        var parameters = new DynamicParameters();
-        parameters.Add(_keyColumn, id);
-        // TODO: Đổi tên stored procedure nếu database dùng tên khác.
-        return await connection.ExecuteAsync(_deleteProcedure, parameters, commandType: CommandType.StoredProcedure);
+        var sql =
+            $"DELETE FROM {EscapeIdentifier(_tableName)} " +
+            $"WHERE {EscapeIdentifier(_keyColumn)} = @Id;";
+        return await connection.ExecuteAsync(sql, new { Id = id });
     }
+
+    private static DynamicParameters BuildParameters(TEntity entity, IEnumerable<string> parameterNames)
+    {
+        var parameters = new DynamicParameters();
+        var entityType = typeof(TEntity);
+
+        foreach (var name in parameterNames)
+        {
+            var property = entityType.GetProperty(name)
+                ?? throw new InvalidOperationException(
+                    $"Không tìm thấy thuộc tính {name} trên {entityType.Name}.");
+            parameters.Add(name, property.GetValue(entity));
+        }
+
+        return parameters;
+    }
+
+    private static string EscapeIdentifier(string identifier) =>
+        $"[{identifier.Replace("]", "]]", StringComparison.Ordinal)}]";
 }
