@@ -7,8 +7,6 @@ EXEC dbo.SP_THEM_KHACHTHUE
     @DiaChi = N'TP.HCM',
     @MaKhachMoi = @MaKhachMoi OUTPUT;
 
-SELECT @MaKhachMoi AS MaKhachMoi;
-
 SELECT MaKhach, HoTen, CCCD, SoDienThoai, DiaChi
 FROM KHACHTHUE
 WHERE MaKhach = @MaKhachMoi;
