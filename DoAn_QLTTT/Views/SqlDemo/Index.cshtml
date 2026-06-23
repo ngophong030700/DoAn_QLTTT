@@ -410,7 +410,7 @@
                         }
                         else
                         {
-                            @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle) || !string.IsNullOrWhiteSpace(scenario.OutputMessage))
+                           @*  @if (!string.IsNullOrWhiteSpace(scenario.OutputTitle) || !string.IsNullOrWhiteSpace(scenario.OutputMessage))
                             {
                                 <div class="sql-demo-result sql-demo-result-success shadow-sm">
                                     <div class="sql-demo-result-icon">
@@ -426,7 +426,7 @@
                                         }
                                     </div>
                                 </div>
-                            }
+                            } *@
                             @if (scenario.CreatedCustomerId.HasValue)
                             {
                                 <div class="alert alert-info border-0 bg-info bg-opacity-10 text-info-emphasis">

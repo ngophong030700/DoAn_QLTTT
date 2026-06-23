@@ -217,6 +217,44 @@ public class SqlDemoService : ISqlDemoService
         return null;
     }
 
+    private static readonly System.Collections.Generic.HashSet<string> KnownTables = new(System.StringComparer.OrdinalIgnoreCase)
+    {
+        "KHACHTHUE", "PHONGTRO", "HOPDONG", "CHITIETHOPDONG", "DICHVU", 
+        "CHISODIENNUOC", "HOADON", "CHITIETHOADON", "THANHTOAN", "NGUOIDUNG", "LOAIPHONG"
+    };
+
+    private static readonly System.Text.RegularExpressions.Regex TableExtractionRegex = new(
+        @"\b(?:FROM|JOIN)\s+(?:\[?(?:dbo|\w+)\]?\.+)?\[?([a-zA-Z_][a-zA-Z0-9_]*)\]?", 
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled
+    );
+
+    private static string DetermineTitleFromSql(string sqlScript, string defaultTitle)
+    {
+        if (string.IsNullOrWhiteSpace(sqlScript)) return defaultTitle;
+
+        var matches = TableExtractionRegex.Matches(sqlScript);
+        var detectedTables = new System.Collections.Generic.List<string>();
+
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            if (match.Groups.Count > 1)
+            {
+                string tableName = match.Groups[1].Value.ToUpper();
+                if (KnownTables.Contains(tableName) && !detectedTables.Contains(tableName))
+                {
+                    detectedTables.Add(tableName);
+                }
+            }
+        }
+
+        if (detectedTables.Count > 0)
+        {
+            return $"Bảng: {string.Join(", ", detectedTables)}";
+        }
+
+        return defaultTitle;
+    }
+
     private async Task<IReadOnlyList<SqlDemoTableViewModel>> ExecuteSubmittedScriptAsync(string sqlScript)
     {
         var batches = SplitSqlBatches(sqlScript).ToList();
@@ -238,11 +276,15 @@ public class SqlDemoService : ISqlDemoService
                 var rows = (await grid.ReadAsync()).Cast<IDictionary<string, object?>>().ToList();
                 var columns = rows.FirstOrDefault()?.Keys.ToList() ?? [];
 
+                var defaultTitle = batches.Count == 1
+                    ? $"Kết quả SQL #{resultIndex}"
+                    : $"Kết quả SQL batch {batchIndex + 1}.{resultIndex}";
+
+                var dynamicTitle = DetermineTitleFromSql(batches[batchIndex], defaultTitle);
+
                 tables.Add(new SqlDemoTableViewModel
                 {
-                    Title = batches.Count == 1
-                        ? $"Kết quả SQL #{resultIndex}"
-                        : $"Kết quả SQL batch {batchIndex + 1}.{resultIndex}",
+                    Title = dynamicTitle,
                     Columns = columns,
                     Rows = rows.Select(row => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?>(row)).ToList()
                 });
