@@ -78,7 +78,6 @@ public class SqlDemoService : ISqlDemoService
         catch (Exception ex)
         {
             model.ErrorMessage = $"Lỗi thực thi script: {ex.Message}";
-            model.AfterTables = model.BeforeTables;
         }
 
         return model;
