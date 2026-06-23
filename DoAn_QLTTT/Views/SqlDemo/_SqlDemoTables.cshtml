@@ -4,9 +4,9 @@
     private static string FormatCell(string columnName, object? value)
     {
         if (value == null) return "";
-        
+
         string valStr = value.ToString() ?? "";
-        
+
         // Handle TrangThai (Status)
         if (columnName.Equals("TrangThai", StringComparison.OrdinalIgnoreCase) || columnName.Contains("TrangThai", StringComparison.OrdinalIgnoreCase))
         {
@@ -27,7 +27,7 @@
             if (valStr.Equals("Đã kết thúc", StringComparison.OrdinalIgnoreCase) || valStr.Equals("DaKetThuc", StringComparison.OrdinalIgnoreCase) || valStr.Equals("Hết hạn", StringComparison.OrdinalIgnoreCase))
                 return "<span class=\"badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill\"><i class=\"bi bi-archive-fill me-1\"></i>Đã kết thúc</span>";
         }
-        
+
         // Handle HinhThuc (payment method)
         if (columnName.Equals("HinhThuc", StringComparison.OrdinalIgnoreCase) || columnName.Equals("HinhThucThanhToan", StringComparison.OrdinalIgnoreCase))
         {
@@ -44,7 +44,7 @@
                        columnName.Contains("SoTien", StringComparison.OrdinalIgnoreCase) ||
                        columnName.Contains("ConLai", StringComparison.OrdinalIgnoreCase) ||
                        columnName.Contains("TieuThu", StringComparison.OrdinalIgnoreCase) && valStr.Length > 4; // safety
-                       
+
         if (isMoney && (value is decimal || value is double || value is float || value is int || value is long || decimal.TryParse(valStr, out _)))
         {
             decimal num = 0;
@@ -54,7 +54,7 @@
             else if (value is int i) num = i;
             else if (value is long l) num = l;
             else decimal.TryParse(valStr, out num);
-            
+
             return $"<strong class=\"text-dark fw-700\">{num.ToString("N0")} ₫</strong>";
         }
 
@@ -68,6 +68,12 @@
         if (columnName.Equals("SDT", StringComparison.OrdinalIgnoreCase) || columnName.Equals("DienThoai", StringComparison.OrdinalIgnoreCase) || columnName.Contains("SoDienThoai", StringComparison.OrdinalIgnoreCase))
         {
             return $"<span class=\"text-nowrap\"><i class=\"bi bi-telephone text-muted me-1\"></i>{valStr}</span>";
+        }
+
+        //Handle Nam 
+        if (columnName.Equals("Nam", StringComparison.OrdinalIgnoreCase))
+        {
+            return value + "";
         }
 
         // Handle date columns
