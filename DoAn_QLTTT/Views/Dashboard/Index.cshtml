@@ -218,6 +218,93 @@
     </div>
 </div>
 
+<div class="row g-4 mb-4">
+    <!-- Chart 3: Debt Ratio -->
+    <div class="col-xl-6">
+        <div class="table-card p-4 border bg-white shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h5 fw-800 text-dark mb-1">
+                        <i class="bi bi-shield-exclamation text-danger me-2"></i>Tỷ lệ nợ động / quá hạn
+                    </h2>
+                    <p class="text-muted small mb-0 fw-600">Cho thấy tỷ lệ công nợ và nợ quá hạn trong hệ thống</p>
+                </div>
+                <span class="badge bg-light text-secondary border fw-700 py-1.5 px-2.5">Đơn vị: %</span>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="debtRatioChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 4: Top Rooms Utilities -->
+    <div class="col-xl-6">
+        <div class="table-card p-4 border bg-white shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h5 fw-800 text-dark mb-1">
+                        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Danh sách phòng dùng nhiều điện nước
+                    </h2>
+                    <p class="text-muted small mb-0 fw-600">Xác định các phòng tiêu thụ điện/nước cao nhất</p>
+                </div>
+                <div style="width: 130px;">
+                    <select id="filterUtilityType" class="form-select form-select-sm fw-700 rounded-3 text-secondary border">
+                        <option value="All">Tất cả</option>
+                        <option value="Điện">Điện</option>
+                        <option value="Nước">Nước</option>
+                    </select>
+                </div>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="topUtilityRoomChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Chart 5: Expiring Contracts -->
+    <div class="col-xl-12">
+        <div class="table-card p-4 border bg-white shadow-sm rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h5 fw-800 text-dark mb-1">
+                        <i class="bi bi-calendar-event-fill text-primary me-2"></i>Hợp đồng sắp hết hạn
+                    </h2>
+                    <p class="text-muted small mb-0 fw-600">Theo dõi các hợp đồng sắp hết hạn để chủ trọ xử lý gia hạn hoặc nhắc khách</p>
+                </div>
+                <span class="badge bg-light text-secondary border fw-700 py-1.5 px-2.5">Thời hạn: ≤ 60 ngày</span>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div style="position: relative; height: 320px; width: 100%;">
+                        <canvas id="expiringContractChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="table-responsive border rounded-3" style="max-height: 320px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0" id="expiringContractsTable">
+                            <thead class="bg-light sticky-top">
+                                <tr>
+                                    <th>Số phòng</th>
+                                    <th>Khách đại diện</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Ngày kết thúc</th>
+                                    <th class="text-end">Còn lại</th>
+                                    <th class="text-center">Cảnh báo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinamically rendered by Javascript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
     <!-- Recent Bills Table -->
     <div class="col-xl-8">
@@ -493,6 +580,374 @@
                 },
                 plugins: [centerTextPlugin]
             });
+
+            // Declare chart variables
+            let debtRatioChart;
+            let topUtilityRoomChart;
+            let expiringContractChart;
+
+            // Fetch extra charts data from API
+            fetch('/Dashboard/GetExtraChartsData')
+                .then(response => response.json())
+                .then(data => {
+                    const debtRatio = data.debtRatio || data.DebtRatio || {};
+                    const topUtilities = data.topUtilities || data.TopUtilities || [];
+                    const expiringContracts = data.expiringContracts || data.ExpiringContracts || [];
+
+                    // 1. Debt Ratio Chart (Dashboard 3)
+                    const tyLeNoDong = debtRatio.tyLeNoDong_PhanTram !== undefined ? debtRatio.tyLeNoDong_PhanTram : (debtRatio.TyLeNoDong_PhanTram !== undefined ? debtRatio.TyLeNoDong_PhanTram : 29.93);
+                    const tyLeNoQuaHan = debtRatio.tyLeNoQuaHan_PhanTram !== undefined ? debtRatio.tyLeNoQuaHan_PhanTram : (debtRatio.TyLeNoQuaHan_PhanTram !== undefined ? debtRatio.TyLeNoQuaHan_PhanTram : 67.8);
+
+                    const ctx3 = document.getElementById('debtRatioChart').getContext('2d');
+                    debtRatioChart = new Chart(ctx3, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Tỷ lệ nợ động', 'Tỷ lệ nợ quá hạn'],
+                            datasets: [{
+                                label: 'Tỷ lệ (%)',
+                                data: [tyLeNoDong, tyLeNoQuaHan],
+                                backgroundColor: [
+                                    'rgba(239, 68, 68, 0.75)', // Red for debt ratio
+                                    'rgba(245, 158, 11, 0.75)'  // Warning orange for overdue ratio
+                                ],
+                                borderColor: [
+                                    'rgba(239, 68, 68, 1)',
+                                    'rgba(245, 158, 11, 1)'
+                                ],
+                                borderWidth: 2,
+                                borderRadius: 6,
+                                barThickness: 32
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                                    titleColor: '#0f172a',
+                                    titleFont: { size: 12, weight: 'bold' },
+                                    bodyColor: '#475569',
+                                    bodyFont: { size: 12, weight: '600' },
+                                    borderColor: 'rgba(15, 23, 42, 0.05)',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ` ${context.label}: ${context.parsed.x}%`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    grid: {
+                                        color: 'rgba(15, 23, 42, 0.04)',
+                                        drawBorder: false
+                                    },
+                                    ticks: {
+                                        font: { size: 10, weight: '700' },
+                                        color: '#94a3b8',
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                },
+                                y: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { size: 11, weight: '700' },
+                                        color: '#475569'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 2. Top Rooms Utilities Chart (Dashboard 4)
+                    const ctx4 = document.getElementById('topUtilityRoomChart').getContext('2d');
+                    
+                    function updateUtilityChart(filterType) {
+                        let processed = [];
+                        if (filterType === 'All') {
+                            const roomMap = {};
+                            topUtilities.forEach(item => {
+                                const soPhong = item.soPhong || item.SoPhong;
+                                const tongTien = item.tongTien !== undefined ? item.tongTien : item.TongTien;
+                                if (!roomMap[soPhong]) {
+                                    roomMap[soPhong] = { soPhong: soPhong, tongTien: 0, tenDichVu: "" };
+                                }
+                                roomMap[soPhong].tongTien += tongTien;
+                            });
+                            processed = Object.values(roomMap);
+                        } else {
+                            processed = topUtilities
+                                .filter(item => (item.tenDichVu || item.TenDichVu) === filterType)
+                                .map(item => ({
+                                    soPhong: item.soPhong || item.SoPhong,
+                                    tongTien: item.tongTien !== undefined ? item.tongTien : item.TongTien,
+                                    tenDichVu: item.tenDichVu || item.TenDichVu
+                                }));
+                        }
+                        
+                        processed.sort((a, b) => b.tongTien - a.tongTien);
+                        processed = processed.slice(0, 10);
+                        
+                        const labels = processed.map(x => x.soPhong);
+                        const values = processed.map(x => x.tongTien);
+                        
+                        if (topUtilityRoomChart) {
+                            topUtilityRoomChart.data.labels = labels;
+                            topUtilityRoomChart.data.datasets[0].data = values;
+                            topUtilityRoomChart.data.datasets[0].rawItems = processed;
+                            
+                            let bgColors, borderColors;
+                            if (filterType === 'Điện') {
+                                bgColors = 'rgba(245, 158, 11, 0.75)'; // Orange/Yellow
+                                borderColors = 'rgba(245, 158, 11, 1)';
+                            } else if (filterType === 'Nước') {
+                                bgColors = 'rgba(59, 130, 246, 0.75)'; // Blue
+                                borderColors = 'rgba(59, 130, 246, 1)';
+                            } else {
+                                bgColors = 'rgba(16, 185, 129, 0.75)'; // Green
+                                borderColors = 'rgba(16, 185, 129, 1)';
+                            }
+                            topUtilityRoomChart.data.datasets[0].backgroundColor = bgColors;
+                            topUtilityRoomChart.data.datasets[0].borderColor = borderColors;
+                            topUtilityRoomChart.update();
+                        } else {
+                            topUtilityRoomChart = new Chart(ctx4, {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Tổng tiền',
+                                        data: values,
+                                        rawItems: processed,
+                                        backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                                        borderColor: 'rgba(16, 185, 129, 1)',
+                                        borderWidth: 2,
+                                        borderRadius: 6,
+                                        barPercentage: 0.5
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                                            titleColor: '#0f172a',
+                                            titleFont: { size: 12, weight: 'bold' },
+                                            bodyColor: '#475569',
+                                            bodyFont: { size: 12, weight: '600' },
+                                            borderColor: 'rgba(15, 23, 42, 0.05)',
+                                            borderWidth: 1,
+                                            padding: 12,
+                                            callbacks: {
+                                                title: function(context) {
+                                                    return `Phòng: ${context[0].label}`;
+                                                },
+                                                label: function(context) {
+                                                    const rawItem = context.dataset.rawItems[context.dataIndex];
+                                                    const serviceStr = rawItem.tenDichVu ? `Dịch vụ: ${rawItem.tenDichVu}` : `Dịch vụ: Điện & Nước`;
+                                                    const moneyStr = `Tổng tiền: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y)}`;
+                                                    return [serviceStr, moneyStr];
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            grid: {
+                                                color: 'rgba(15, 23, 42, 0.04)',
+                                                drawBorder: false
+                                            },
+                                            ticks: {
+                                                font: { size: 10, weight: '700' },
+                                                color: '#94a3b8',
+                                                callback: function(value) {
+                                                    return new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(value);
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            grid: { display: false },
+                                            ticks: {
+                                                font: { size: 10, weight: '700' },
+                                                color: '#94a3b8'
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    
+                    updateUtilityChart('All');
+                    
+                    document.getElementById('filterUtilityType').addEventListener('change', function(e) {
+                        updateUtilityChart(e.target.value);
+                    });
+
+                    // 3. Expiring Contracts Chart (Dashboard 5)
+                    const ctx5 = document.getElementById('expiringContractChart').getContext('2d');
+                    
+                    const bubblePoints = expiringContracts.map(c => {
+                        const ngayKetThucStr = c.ngayKetThuc || c.NgayKetThuc;
+                        const dateObj = new Date(ngayKetThucStr);
+                        const soNgayConLai = c.soNgayConLai !== undefined ? c.soNgayConLai : c.SoNgayConLai;
+                        const soPhong = c.soPhong || c.SoPhong;
+                        const khachDaiDien = c.khachDaiDien || c.KhachDaiDien;
+                        const soDienThoai = c.soDienThoai || c.SoDienThoai;
+                        const nhomCanhBao = c.nhomCanhBao || c.NhomCanhBao;
+
+                        return {
+                            x: dateObj.getTime(), 
+                            y: soNgayConLai,
+                            r: Math.max(8, 25 - soNgayConLai / 3), 
+                            soPhong: soPhong,
+                            khachDaiDien: khachDaiDien,
+                            soDienThoai: soDienThoai,
+                            ngayKetThuc: dateObj.toLocaleDateString('vi-VN'),
+                            soNgayConLai: soNgayConLai,
+                            nhomCanhBao: nhomCanhBao
+                        };
+                    });
+                    
+                    const bubbleBackgrounds = bubblePoints.map(p => 
+                        p.soNgayConLai <= 30 ? 'rgba(239, 68, 68, 0.75)' : 'rgba(245, 158, 11, 0.75)'
+                    );
+                    const bubbleBorders = bubblePoints.map(p => 
+                        p.soNgayConLai <= 30 ? 'rgba(239, 68, 68, 1)' : 'rgba(245, 158, 11, 1)'
+                    );
+                    
+                    expiringContractChart = new Chart(ctx5, {
+                        type: 'bubble',
+                        data: {
+                            datasets: [{
+                                label: 'Hợp đồng sắp hết hạn',
+                                data: bubblePoints,
+                                backgroundColor: bubbleBackgrounds,
+                                borderColor: bubbleBorders,
+                                borderWidth: 2,
+                                hoverRadius: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                                    titleColor: '#0f172a',
+                                    titleFont: { size: 12, weight: 'bold' },
+                                    bodyColor: '#475569',
+                                    bodyFont: { size: 12, weight: '600' },
+                                    borderColor: 'rgba(15, 23, 42, 0.05)',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    callbacks: {
+                                        title: function(context) {
+                                            const item = context[0].raw;
+                                            return `Phòng: ${item.soPhong}`;
+                                        },
+                                        label: function(context) {
+                                            const item = context.raw;
+                                            return [
+                                                `Khách: ${item.khachDaiDien}`,
+                                                `SĐT: ${item.soDienThoai}`,
+                                                `Ngày kết thúc: ${item.ngayKetThuc}`,
+                                                `Số ngày còn lại: ${item.soNgayConLai} ngày`,
+                                                `Cảnh báo: ${item.nhomCanhBao}`
+                                            ];
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    type: 'linear',
+                                    grid: {
+                                        color: 'rgba(15, 23, 42, 0.04)'
+                                    },
+                                    ticks: {
+                                        font: { size: 9, weight: '700' },
+                                        color: '#94a3b8',
+                                        callback: function(value) {
+                                            return new Date(value).toLocaleDateString('vi-VN', { month: '2-digit', day: '2-digit' });
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Ngày kết thúc',
+                                        font: { size: 10, weight: 'bold' },
+                                        color: '#64748b'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    max: 70,
+                                    grid: {
+                                        color: 'rgba(15, 23, 42, 0.04)'
+                                    },
+                                    ticks: {
+                                        font: { size: 10, weight: '700' },
+                                        color: '#94a3b8'
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Số ngày còn lại',
+                                        font: { size: 10, weight: 'bold' },
+                                        color: '#64748b'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Render table below/beside the chart
+                    const tableBody = document.querySelector('#expiringContractsTable tbody');
+                    if (tableBody) {
+                        tableBody.innerHTML = '';
+                        if (expiringContracts.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Không có hợp đồng nào sắp hết hạn.</td></tr>';
+                        } else {
+                            expiringContracts.forEach(c => {
+                                const soNgayConLai = c.soNgayConLai !== undefined ? c.soNgayConLai : c.SoNgayConLai;
+                                const soPhong = c.soPhong || c.SoPhong;
+                                const khachDaiDien = c.khachDaiDien || c.KhachDaiDien;
+                                const soDienThoai = c.soDienThoai || c.SoDienThoai;
+                                const ngayKetThucStr = c.ngayKetThuc || c.NgayKetThuc;
+                                const nhomCanhBao = c.nhomCanhBao || c.NhomCanhBao;
+                                
+                                const isCritical = soNgayConLai <= 30;
+                                const badgeClass = isCritical ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10' : 'bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10';
+                                const row = `
+                                    <tr>
+                                        <td class="fw-700 text-dark">${soPhong}</td>
+                                        <td class="fw-600">${khachDaiDien}</td>
+                                        <td class="text-secondary small font-monospace">${soDienThoai}</td>
+                                        <td class="text-secondary small">${new Date(ngayKetThucStr).toLocaleDateString('vi-VN')}</td>
+                                        <td class="text-end fw-700 ${isCritical ? 'text-danger' : 'text-warning'}">${soNgayConLai} ngày</td>
+                                        <td class="text-center">
+                                            <span class="badge rounded-pill fw-700 px-2.5 py-1 ${badgeClass}">${nhomCanhBao}</span>
+                                        </td>
+                                    </tr>
+                                `;
+                                tableBody.insertAdjacentHTML('beforeend', row);
+                            });
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching extra charts data:', error));
         });
     </script>
 }

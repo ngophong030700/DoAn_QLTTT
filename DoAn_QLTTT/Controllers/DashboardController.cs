@@ -17,4 +17,11 @@ public class DashboardController : AdminControllerBase
         ViewData["Title"] = "Báo cáo";
         return View(await _dashboardService.GetDashboardAsync());
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetExtraChartsData()
+    {
+        var data = await _dashboardService.GetDashboardChartsDataAsync();
+        return Json(data);
+    }
 }
