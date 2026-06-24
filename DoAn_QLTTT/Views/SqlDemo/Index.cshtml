@@ -312,13 +312,13 @@
                                                                 @foreach (var option in scenario.InvoiceOptions)
                                                                 {
                                                                     <option value="@option.Value"
-                                                                            data-debt="@option.Amount"
+                                                                            data-debt="@((option.Amount ?? 0m).ToString(System.Globalization.CultureInfo.InvariantCulture))"
                                                                             selected="@(option.Value.ToString() == selectedInvoice ? "selected" : null)">@option.Label</option>
                                                                 }
                                                             </select>
                                                         </div>
                                                         <div><label class="form-label">Ngày thu tiền</label><input id="param-ngay-thu" type="date" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"@NgayThu\s*=\s*'(?<value>[^']*)'") : DateTime.Today.ToString("yyyy-MM-dd"))" required /></div>
-                                                        <div><label class="form-label">Số tiền đóng</label><input id="param-so-tien" type="number" min="1" step="1000" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"DECLARE\s+@SoTienThanhToan\s+DECIMAL\(18,0\)\s*=\s*(?<value>\d+)") : "")" placeholder="Nhập số tiền khách đóng" required /></div>
+                                                        <div><label class="form-label">Số tiền đóng</label><input id="param-so-tien" type="number" min="1" step="1" class="form-control sql-param" value="@(scenario.HasExecuted ? GetSqlValue(scenario.SqlScript, @"DECLARE\s+@SoTienThanhToan\s+DECIMAL\(18,0\)\s*=\s*(?<value>\d+)") : "")" placeholder="Nhập số tiền khách đóng" required /></div>
                                                         <div class="form-text" id="payment-debt-note">Chọn hóa đơn để xem số nợ còn lại.</div>
                                                         <div><label class="form-label">Hình thức thanh toán</label><select id="param-hinh-thuc" class="form-select sql-param" required><option value="">Chọn hình thức</option><option value="TienMat">Tiền mặt</option><option value="ChuyenKhoan">Chuyển khoản</option></select></div>
                                                     }
