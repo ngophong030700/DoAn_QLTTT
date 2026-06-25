@@ -8,7 +8,10 @@
         <input class="form-control me-2" type="search" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm phòng, loại, trạng thái" />
         <button class="btn btn-outline-secondary" type="submit">Tìm</button>
     </form>
-    <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
+    @if (User.IsInRole(AppStatuses.VaiTro.Admin))
+    {
+        <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
+    }
 </div>
 
 <div class="table-card table-responsive">
